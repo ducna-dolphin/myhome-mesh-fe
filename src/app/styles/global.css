@@ -1,0 +1,221 @@
+@import './fonts.css';
+@import './tokens.css';
+
+/* ---------- Reset ---------- */
+:root {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+body {
+  background: var(--color-bg);
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+/* Every tappable element draws its own pressed state; the grey WebView flash only adds noise. */
+:root {
+  -webkit-tap-highlight-color: transparent;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Sub-page navigation (View Transitions, react-router `viewTransition`) ----------
+ * `data-nav` on <html> is set by the app shell during the route commit: `forward` when going one
+ * level deeper (tab → detail → edit), `back` when coming up. Unsupported browsers just swap.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-page);
+  animation-timing-function: var(--ease-out-quint);
+}
+:root[data-nav='forward']::view-transition-old(root) {
+  animation-name: vt-push-out;
+}
+:root[data-nav='forward']::view-transition-new(root) {
+  animation-name: vt-push-in;
+}
+:root[data-nav='back']::view-transition-old(root) {
+  z-index: 1;
+  animation-name: vt-pop-out;
+  animation-duration: var(--duration-exit-slow);
+  animation-timing-function: var(--ease-out-quart);
+}
+:root[data-nav='back']::view-transition-new(root) {
+  animation-name: vt-pop-in;
+}
+@keyframes vt-push-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes vt-push-out {
+  to {
+    transform: translateX(-24%);
+    opacity: 0.6;
+  }
+}
+@keyframes vt-pop-in {
+  from {
+    transform: translateX(-24%);
+    opacity: 0.6;
+  }
+}
+@keyframes vt-pop-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Shell layout ---------- */
+.app-shell {
+  width: min(100%, 430px);
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--color-bg);
+  position: relative;
+  box-shadow: var(--shadow-shell);
+}
+
+/* ---------- Headers & layouts ---------- */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  height: calc(var(--size-header) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) var(--space-4) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-divider);
+}
+.app-header__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-header--sub {
+  padding-left: var(--space-2);
+}
+.app-header--sub .app-header__title {
+  font-size: var(--font-size-heading);
+}
+
+.internet-screen,
+.sub-page {
+  display: grid;
+  /* minmax(0, 1fr): a wide child (nowrap tabs, chips) must not widen the page past the viewport. */
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+}
+.internet-screen__loading {
+  display: grid;
+  gap: var(--space-3);
+}
+/* Pill tabs stay under the header while the tab content scrolls. */
+.internet-screen__tabs {
+  position: sticky;
+  top: calc(var(--size-header) + env(safe-area-inset-top));
+  z-index: var(--z-raised);
+  margin: 0 calc(-1 * var(--space-4));
+  padding: var(--space-1) var(--space-4) var(--space-2);
+  background: var(--color-bg);
+}
+.internet-screen__panel {
+  min-width: 0;
+}
+/* Tab switch: the new panel cross-fades in (keyed on the pathname). */
+.internet-screen__panel-content {
+  animation: ui-panel-in var(--duration-base) var(--ease-out-quart);
+}
+@keyframes ui-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+.stack {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.text-button {
+  min-height: var(--size-touch);
+  border: 0;
+  background: transparent;
+  color: var(--color-brand);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.fatal-error {
+  padding: 40px 18px;
+  text-align: center;
+  color: var(--color-danger-fg);
+}

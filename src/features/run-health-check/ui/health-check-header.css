@@ -1,0 +1,179 @@
+.health-header {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.health-header__steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.health-step {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+/* Connector to the next step: grey track (::before) that fills with brand (::after) once done. */
+.health-step:not(:last-child)::before,
+.health-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 30px;
+  left: calc(50% + 30px);
+  right: calc(-50% + 30px);
+  height: 1px;
+  background: var(--color-border);
+}
+.health-step:not(:last-child)::after {
+  height: 2px;
+  margin-top: -0.5px;
+  background: var(--color-brand);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-slow) var(--ease-out-quart);
+}
+.health-step--done:not(:last-child)::after,
+.health-step--failed:not(:last-child)::after {
+  transform: scaleX(1);
+}
+.health-step__circle {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--color-chevron);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text-disabled);
+}
+.health-step--running .health-step__circle {
+  border-color: var(--color-brand);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  animation: health-step-pulse 1.4s var(--ease-standard) infinite;
+}
+.health-step__circle {
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
+}
+.health-step--done .health-step__circle {
+  border: 1px solid var(--color-brand);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+.health-step--failed .health-step__circle {
+  border: 1px solid var(--color-text-disabled);
+  background: var(--color-track);
+  color: var(--color-text-2);
+}
+.health-step__badge {
+  animation: health-badge-pop var(--duration-base) var(--ease-out-expo) both;
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+.health-step__badge--failed {
+  background: var(--color-text-2);
+}
+.health-step__label {
+  font-size: var(--font-size-caption);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+}
+.health-step--pending .health-step__label {
+  color: var(--color-text-muted);
+}
+
+.health-header__status {
+  display: grid;
+  gap: var(--space-1);
+  text-align: center;
+}
+.health-header__title {
+  margin: 0;
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+.health-header__hint,
+.health-header__overall,
+.health-header__last {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-muted);
+}
+.health-header__error {
+  margin: 0;
+  font-size: var(--font-size-caption);
+  color: var(--color-danger-fg);
+}
+
+.health-header__progress {
+  height: 4px;
+  margin: 0 var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--color-track);
+  overflow: hidden;
+}
+.health-header__progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-brand);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
+  transition: transform var(--duration-slow) var(--ease-out-quart);
+}
+
+.health-header__footer {
+  /* Anchor for the SpecNote tooltip. */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.health-header__last {
+  font-size: var(--font-size-caption);
+}
+
+@keyframes health-badge-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+@keyframes health-step-pulse {
+  50% {
+    box-shadow: 0 0 0 6px var(--color-brand-soft);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .health-step--running .health-step__circle {
+    animation: none;
+  }
+}
+.health-header__recheck {
+  display: inline-flex;
+  align-items: center;
+}

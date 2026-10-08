@@ -1,0 +1,41 @@
+.screen-state {
+  padding: 40px 18px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+.screen-state--error {
+  color: var(--color-danger-fg);
+}
+.screen-state p {
+  margin: 0;
+}
+.screen-state .text-button {
+  margin-top: var(--space-3);
+}
+.screen-state--compact {
+  width: 100%;
+  padding: 10px var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-bg);
+  text-align: left;
+  font-size: var(--font-size-body);
+}
+.screen-state--empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  animation: ui-fade-in var(--duration-base) var(--ease-out-quart);
+}
+.screen-state__icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}

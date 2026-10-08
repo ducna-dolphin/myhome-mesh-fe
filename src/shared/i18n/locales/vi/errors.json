@@ -1,0 +1,59 @@
+{
+  "code": {
+    "BAD_REQUEST": "Có lỗi xảy ra, vui lòng thử lại sau.",
+    "VALIDATION_FAILED": "Thông tin chưa hợp lệ, vui lòng kiểm tra lại.",
+    "IDEMPOTENCY_KEY_REQUIRED": "Có lỗi xảy ra, vui lòng thử lại sau.",
+    "UNAUTHENTICATED": "Phiên đăng nhập đã hết hạn. Vui lòng mở lại ứng dụng.",
+    "TOKEN_EXPIRED": "Phiên đăng nhập đã hết hạn. Vui lòng mở lại ứng dụng.",
+    "FORBIDDEN": "Bạn không có quyền thực hiện thao tác này.",
+    "NOT_FOUND": "Không tìm thấy thông tin yêu cầu.",
+    "CONFLICT": "Trạng thái đã thay đổi. Vui lòng tải lại rồi thử lại.",
+    "REQUEST_IN_PROGRESS": "Yêu cầu đang được xử lý, vui lòng đợi trong giây lát.",
+    "IDEMPOTENCY_KEY_REUSED": "Có lỗi xảy ra, vui lòng thử lại.",
+    "PAYLOAD_TOO_LARGE": "Dữ liệu gửi lên quá lớn.",
+    "RATE_LIMITED": "Bạn thao tác quá nhiều lần. Vui lòng thử lại sau.",
+    "INTERNAL": "Hệ thống đang gặp sự cố. Vui lòng thử lại sau.",
+    "SERVICE_UNAVAILABLE": "Hệ thống đang bảo trì hoặc quá tải. Vui lòng thử lại sau.",
+    "UPSTREAM_UNAVAILABLE": "Chưa lấy được thông tin, vui lòng thử lại sau.",
+    "UPSTREAM_TIMEOUT": "Thiết bị phản hồi chậm, vui lòng thử lại sau.",
+    "UPSTREAM_REJECTED": "Hệ thống đang gặp sự cố. Vui lòng thử lại sau.",
+    "LOCATION_LIMIT_REACHED": "Bạn đã có đủ 20 vị trí đo. Hãy xoá bớt vị trí để thêm mới.",
+    "DEVICE_NOT_BLOCKABLE": "Không thể chặn hoặc xoá thiết bị này.",
+    "DEVICE_BUSY": "Modem đang thực hiện thao tác khác. Vui lòng thử lại sau.",
+    "DEVICE_OFFLINE": "Modem đang mất kết nối.",
+    "VERIFY_MISMATCH": "Modem chưa áp dụng thay đổi. Vui lòng thử lại."
+  },
+  "client": {
+    "NETWORK_ERROR": "Không có kết nối mạng. Vui lòng kiểm tra rồi thử lại.",
+    "CLIENT_TIMEOUT": "Kết nối quá thời gian chờ, vui lòng thử lại.",
+    "INVALID_RESPONSE": "Dữ liệu nhận được không hợp lệ. Vui lòng thử lại sau."
+  },
+  "bridge": {
+    "BRIDGE_UNSUPPORTED": "Phiên bản ứng dụng MyHome chưa hỗ trợ tính năng này.",
+    "PERMISSION_DENIED": "Ứng dụng chưa được cấp quyền cần thiết.",
+    "TIMEOUT": "Ứng dụng phản hồi chậm, vui lòng thử lại.",
+    "FAILED": "Không thực hiện được, vui lòng thử lại."
+  },
+  "http": {
+    "400": "Yêu cầu không hợp lệ.",
+    "401": "Phiên đăng nhập đã hết hạn. Vui lòng mở lại ứng dụng.",
+    "403": "Bạn không có quyền thực hiện thao tác này.",
+    "404": "Không tìm thấy thông tin yêu cầu.",
+    "409": "Chưa thực hiện được lúc này. Vui lòng tải lại rồi thử lại.",
+    "413": "Dữ liệu gửi lên quá lớn.",
+    "422": "Có lỗi xảy ra, vui lòng thử lại.",
+    "429": "Bạn thao tác quá nhiều lần. Vui lòng thử lại sau.",
+    "500": "Hệ thống đang gặp sự cố. Vui lòng thử lại sau.",
+    "502": "Hệ thống đang gặp sự cố. Vui lòng thử lại sau.",
+    "503": "Hệ thống đang bận. Vui lòng thử lại sau.",
+    "504": "Hệ thống phản hồi chậm. Vui lòng thử lại sau."
+  },
+  "generic": {
+    "clientError": "Có lỗi xảy ra, vui lòng thử lại sau.",
+    "retryLater": "Hệ thống đang bận. Vui lòng thử lại sau.",
+    "unknown": "Đã có lỗi xảy ra. Vui lòng thử lại."
+  },
+  "command": {
+    "TIMEOUT": "Chưa nhận được xác nhận từ modem. Kết quả sẽ được cập nhật sau."
+  }
+}

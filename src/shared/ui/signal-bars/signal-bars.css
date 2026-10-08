@@ -1,0 +1,60 @@
+.ui-signal-bars {
+  --signal-color: var(--color-text-disabled);
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+.ui-signal-bars--good {
+  --signal-color: var(--color-signal-good-border);
+}
+.ui-signal-bars--fair {
+  --signal-color: var(--color-signal-fair-border);
+}
+.ui-signal-bars--weak {
+  --signal-color: var(--color-signal-weak-border);
+}
+.ui-signal-bars__bar {
+  width: 4px;
+  border-radius: 1px;
+  background: var(--color-track);
+}
+.ui-signal-bars__bar:nth-child(1) {
+  height: 40%;
+}
+.ui-signal-bars__bar:nth-child(2) {
+  height: 70%;
+}
+.ui-signal-bars__bar:nth-child(3) {
+  height: 100%;
+}
+.ui-signal-bars__bar.is-filled {
+  background: var(--signal-color);
+}
+.ui-signal-bars__bar {
+  transform-origin: bottom;
+}
+/* Result reveal: bars rise and take their colour one after another. */
+.ui-signal-bars--animated .ui-signal-bars__bar {
+  animation: ui-bar-rise var(--duration-base) var(--ease-out-quart) both;
+}
+.ui-signal-bars--animated .ui-signal-bars__bar.is-filled {
+  animation-name: ui-bar-fill;
+}
+.ui-signal-bars--animated .ui-signal-bars__bar:nth-child(2) {
+  animation-delay: calc(var(--duration-base) * 0.5);
+}
+.ui-signal-bars--animated .ui-signal-bars__bar:nth-child(3) {
+  animation-delay: var(--duration-base);
+}
+@keyframes ui-bar-rise {
+  from {
+    transform: scaleY(0.2);
+  }
+}
+@keyframes ui-bar-fill {
+  from {
+    transform: scaleY(0.2);
+    background: var(--color-track);
+  }
+}

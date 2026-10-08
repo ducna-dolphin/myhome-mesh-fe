@@ -1,0 +1,95 @@
+.ui-dialog {
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+.ui-dialog__panel {
+  width: min(100%, 304px);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-popover);
+  text-align: center;
+  animation: ui-dialog-in var(--duration-base) var(--ease-out-quint);
+}
+.ui-dialog[data-state='closing'] .ui-dialog__panel {
+  pointer-events: none;
+  animation: ui-dialog-out var(--duration-exit) var(--ease-exit) forwards;
+}
+.ui-dialog__content {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-4) var(--space-4);
+}
+.ui-dialog__title {
+  margin: 0;
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+.ui-dialog__description {
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+}
+.ui-dialog__content > :not(.ui-dialog__title, .ui-dialog__description) {
+  text-align: left;
+}
+.ui-dialog__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--color-divider);
+}
+.ui-dialog__actions--single {
+  grid-template-columns: 1fr;
+}
+.ui-dialog__action {
+  min-height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.ui-dialog__action + .ui-dialog__action {
+  border-left: 1px solid var(--color-divider);
+}
+.ui-dialog__action--confirm {
+  color: var(--color-brand);
+  font-weight: var(--font-weight-semibold);
+}
+.ui-dialog__action--destructive {
+  color: var(--color-danger-fg);
+}
+.ui-dialog__action {
+  transition: background-color var(--duration-instant) var(--ease-standard);
+}
+.ui-dialog__action:active:not(:disabled) {
+  background: var(--color-input);
+}
+.ui-dialog__action:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+.ui-dialog__action:focus-visible {
+  outline-offset: -2px;
+}
+
+@keyframes ui-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@keyframes ui-dialog-out {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}

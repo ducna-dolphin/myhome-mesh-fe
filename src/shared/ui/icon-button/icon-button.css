@@ -1,0 +1,49 @@
+.ui-icon-button {
+  position: relative;
+  width: var(--size-icon-button);
+  height: var(--size-icon-button);
+  flex: 0 0 var(--size-icon-button);
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-instant) var(--ease-standard);
+}
+/* 36px visual, 44px touch target. */
+.ui-icon-button::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+}
+.ui-icon-button--outline {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+.ui-icon-button--soft {
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+.ui-icon-button:active:not(:disabled) {
+  background: var(--color-track);
+  transform: scale(0.92);
+}
+/* Icon swapped in place (eye ↔ eye-off, copy → check) cross-fades instead of jumping. */
+.ui-icon-button .ui-icon {
+  animation: ui-icon-in var(--duration-fast) var(--ease-out-quint);
+}
+.ui-icon-button:disabled {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+@media (hover: hover) {
+  .ui-icon-button:hover:not(:disabled) {
+    background: var(--color-input);
+  }
+}

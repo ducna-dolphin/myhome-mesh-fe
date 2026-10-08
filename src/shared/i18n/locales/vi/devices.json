@@ -1,0 +1,97 @@
+{
+  "title": "Thiết bị kết nối",
+  "filter": {
+    "label": "Lọc thiết bị",
+    "all": "Tất cả",
+    "connected": "Đang kết nối",
+    "blocked": "Đang bị chặn"
+  },
+  "status": {
+    "CONNECTED": "Đang kết nối",
+    "DISCONNECTED": "Không hoạt động",
+    "BLOCKED": "Đã chặn"
+  },
+  "kind": {
+    "MESH": "Mesh",
+    "AP": "Điểm truy cập",
+    "CLIENT": "Thiết bị đầu cuối"
+  },
+  "connectionType": {
+    "WIRED": "Có dây",
+    "WIRELESS": "Wi-Fi"
+  },
+  "unnamed": "Thiết bị không tên",
+  "list": {
+    "loading": "Đang tải danh sách thiết bị",
+    "trafficShare": "{{percent}}% lưu lượng",
+    "sortedByTraffic": "Đang xếp theo lưu lượng sử dụng, thiết bị dùng nhiều nhất ở đầu.",
+    "empty": {
+      "all": "Chưa có thiết bị nào kết nối với modem.",
+      "connected": "Không có thiết bị nào đang kết nối.",
+      "blocked": "Không có thiết bị nào đang bị chặn."
+    },
+    "partialError": {
+      "blockList": "Chưa đọc được danh sách chặn, trạng thái chặn có thể chưa chính xác.",
+      "fingerprint": "Chưa nhận diện được loại của một số thiết bị.",
+      "topology": "Chưa đọc được cấu trúc Mesh nên tạm thời chưa thể chặn thiết bị.",
+      "other": "Một phần thông tin thiết bị chưa tải được."
+    },
+    "showAll": "Xem tất cả thiết bị"
+  },
+  "detail": {
+    "loading": "Đang tải thông tin thiết bị",
+    "notFound": "Không tìm thấy thiết bị. Thiết bị có thể đã bị xoá khỏi danh sách.",
+    "backToList": "Về danh sách thiết bị",
+    "edit": "Đổi tên/Icon thiết bị",
+    "infoTitle": "Thông tin thiết bị",
+    "kind": "Loại thiết bị",
+    "macAddress": "Địa chỉ MAC",
+    "ipAddress": "Địa chỉ IP",
+    "connectedVia": "Kết nối qua"
+  },
+  "block": {
+    "label": "Chặn kết nối Internet",
+    "notBlockable": "Không thể chặn thiết bị Mesh hoặc điểm truy cập, vì cả nhà sẽ mất kết nối.",
+    "selfDevice": "Đây là điện thoại bạn đang dùng nên không thể chặn hoặc xoá.",
+    "sending": "Đang gửi lệnh tới modem…",
+    "waiting": "Đang chờ modem xác nhận. Kết quả sẽ được cập nhật sau.",
+    "confirmTitle": "Chặn kết nối Internet?",
+    "confirmDescription": "{{name}} sẽ không truy cập được Internet cho tới khi bạn bỏ chặn.",
+    "confirm": "Chặn",
+    "blocked": "Đã chặn {{name}}",
+    "unblocked": "Đã bỏ chặn {{name}}"
+  },
+  "remove": {
+    "label": "Xoá thiết bị khỏi kết nối",
+    "confirmTitle": "Xoá thiết bị khỏi kết nối?",
+    "confirmDescription": "{{name}} sẽ bị chặn Internet và ẩn khỏi danh sách thiết bị. Thiết bị chưa tự hiện lại, kể cả khi kết nối lại.",
+    "confirm": "Xoá",
+    "removed": "Đã xoá {{name}} khỏi kết nối",
+    "waiting": "Đang chờ modem xác nhận việc xoá. Kết quả sẽ được cập nhật sau."
+  },
+  "edit": {
+    "nameLabel": "Tên thiết bị",
+    "namePlaceholder": "Nhập tên thiết bị",
+    "nameHint": "Để trống để dùng lại tên modem nhận diện.",
+    "nameTooLong": "Tên tối đa 32 ký tự.",
+    "iconLabel": "Chọn biểu tượng thiết bị",
+    "save": "Lưu thay đổi",
+    "saved": "Đã lưu thay đổi",
+    "icon": {
+      "PHONE": "Điện thoại",
+      "TABLET": "Máy tính bảng",
+      "LAPTOP": "Máy tính xách tay",
+      "TV": "TV",
+      "ROUTER": "Bộ định tuyến",
+      "STORAGE": "Thiết bị lưu trữ",
+      "MESH": "Mesh",
+      "CAMERA": "Camera"
+    }
+  },
+  "action": {
+    "block": "Chặn Internet",
+    "unblock": "Mở Internet",
+    "remove": "Xoá thiết bị khỏi kết nối",
+    "rename": "Đổi tên/Icon thiết bị"
+  }
+}

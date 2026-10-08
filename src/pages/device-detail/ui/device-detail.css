@@ -1,0 +1,84 @@
+.device-detail,
+.device-detail__loading {
+  display: grid;
+  gap: var(--space-3);
+}
+.device-detail__card {
+  display: grid;
+  gap: var(--space-3);
+}
+.device-detail__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-divider);
+}
+.device-detail__icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+.device-detail__icon--blocked {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-fg);
+}
+.device-detail__identity {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.card h2.device-detail__name {
+  overflow: hidden;
+  font-size: var(--font-size-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card h2.device-detail__name--blocked {
+  color: var(--color-danger-fg);
+}
+.device-detail__mac {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+.device-detail__info {
+  display: grid;
+  gap: var(--space-2);
+}
+.device-detail__info-title {
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+}
+.device-detail__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+.device-detail__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--font-size-body);
+}
+.device-detail__row dt {
+  color: var(--color-text-2);
+}
+.device-detail__row dd {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.device-detail__back {
+  justify-self: center;
+  color: var(--color-brand);
+  font-weight: var(--font-weight-semibold);
+}

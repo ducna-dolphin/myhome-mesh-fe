@@ -1,0 +1,4 @@
+.require-serial__loading {
+  display: grid;
+  gap: var(--space-3);
+}

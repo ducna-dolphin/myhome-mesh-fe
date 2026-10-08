@@ -1,0 +1,48 @@
+{
+  "title": "Modem",
+  "deviceType": "ONT",
+  "infoTitle": "Thông tin thiết bị",
+  "field": {
+    "displayName": "Tên modem",
+    "macAddress": "Địa chỉ MAC",
+    "wanIpAddress": "IP WAN",
+    "firmwareVersion": "Phiên bản Firmware",
+    "uptime": "Thời gian hoạt động liên tục",
+    "totalTraffic": "Tổng lưu lượng truy cập *",
+    "temperature": "Nhiệt độ modem *"
+  },
+  "value": {
+    "uptime": "{{days}} ngày {{hours}}g{{minutes}}p",
+    "uptimeShort": "{{hours}}g{{minutes}}p",
+    "traffic": "{{value}} GB",
+    "temperature": "{{value}}°C"
+  },
+  "partialError": "Một số thông tin chưa tải được.",
+  "offline": {
+    "title": "Modem đang mất kết nối",
+    "hint": "Vui lòng kiểm tra nguồn điện và dây mạng của modem rồi thử lại.",
+    "retry": "Thử lại"
+  },
+  "rename": {
+    "edit": "Đổi tên modem",
+    "label": "Tên modem",
+    "save": "Lưu",
+    "cancel": "Huỷ",
+    "required": "Vui lòng nhập tên modem.",
+    "tooLong": "Tên modem tối đa 32 ký tự.",
+    "success": "Đã đổi tên modem."
+  },
+  "reboot": {
+    "action": "Khởi động lại",
+    "running": "Đang khởi động lại…",
+    "runningHint": "Mạng sẽ gián đoạn khoảng 2 phút.",
+    "confirmTitle": "Khởi động lại modem?",
+    "confirmDescription": "Mạng Internet và Wi-Fi sẽ gián đoạn khoảng 2 phút trong lúc modem khởi động lại.",
+    "confirm": "Khởi động lại",
+    "cancel": "Huỷ",
+    "done": "Modem đã khởi động lại xong.",
+    "rateLimited": "Modem chỉ được khởi động lại tối đa 3 lần trong 30 phút. Vui lòng thử lại sau {{minutes}} phút.",
+    "rateLimitedNoTime": "Modem chỉ được khởi động lại tối đa 3 lần trong 30 phút. Vui lòng thử lại sau."
+  },
+  "empty": "—"
+}

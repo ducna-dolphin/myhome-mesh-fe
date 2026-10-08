@@ -1,0 +1,46 @@
+.device-list {
+  display: grid;
+  gap: var(--space-3);
+}
+.device-list__filters {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  margin: 0 calc(-1 * var(--space-4));
+  padding: var(--space-1) var(--space-4);
+  scrollbar-width: none;
+}
+/* XD: the three chips share the row at 390px; narrower screens scroll horizontally. */
+.device-list__filters > * {
+  flex: 1 0 auto;
+  padding-inline: var(--space-2);
+  font-size: var(--font-size-caption);
+}
+.device-list__filters::-webkit-scrollbar {
+  display: none;
+}
+.device-list__loading,
+.device-list__items {
+  display: grid;
+  gap: var(--space-2);
+}
+.device-list__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.device-list__row[data-focused] {
+  box-shadow:
+    0 0 0 2px var(--color-brand),
+    var(--shadow-card);
+}
+.device-list__note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+.device-list__share {
+  color: var(--color-text-2);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+}

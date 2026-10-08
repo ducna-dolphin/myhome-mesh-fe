@@ -1,0 +1,110 @@
+.modem-tab {
+  display: grid;
+  gap: var(--space-3);
+}
+.modem-card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+.modem-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.modem-card__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.modem-card__title {
+  margin: 0;
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+.modem-card__model {
+  margin: calc(var(--space-2) * -1) 0 0;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+.modem-card__section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.modem-card__section-title {
+  margin: 0;
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.modem-info {
+  margin: 0;
+}
+.modem-info__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-2) 0;
+}
+.modem-info__row + .modem-info__row {
+  border-top: 1px solid var(--color-divider);
+}
+.modem-info__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-body);
+  color: var(--color-text-2);
+}
+.modem-info__value {
+  flex: 1;
+  margin: 0;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.modem-info__value--nowrap {
+  min-width: max-content;
+  white-space: nowrap;
+}
+
+.modem-offline {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  color: var(--color-danger-fg);
+  text-align: center;
+}
+.modem-offline__title {
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-semibold);
+}
+.modem-offline__hint {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-muted);
+}

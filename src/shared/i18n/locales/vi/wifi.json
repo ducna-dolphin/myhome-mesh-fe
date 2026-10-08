@@ -1,0 +1,83 @@
+{
+  "title": "Wi-Fi",
+  "band": {
+    "BAND_2_4GHZ": "2.4GHz",
+    "BAND_5GHZ": "5GHz"
+  },
+  "enabled": "Đang bật",
+  "disabled": "Đang tắt",
+  "list": {
+    "title": "Danh sách Wi-fi ({{count}})",
+    "loading": "Đang tải danh sách Wi-Fi",
+    "empty": "Modem chưa có mạng Wi-Fi nào.",
+    "openOptions": "Tuỳ chọn cho {{ssid}}",
+    "passwordLabel": "Mật khẩu",
+    "applying": "Đang áp dụng…",
+    "awaitingConfirmation": "Đã gửi yêu cầu, đang chờ modem xác nhận"
+  },
+  "password": {
+    "masked": "Mật khẩu đang ẩn",
+    "show": "Hiện mật khẩu",
+    "hide": "Ẩn mật khẩu",
+    "copy": "Sao chép mật khẩu",
+    "copied": "Đã sao chép mật khẩu",
+    "copyFailed": "Không sao chép được mật khẩu. Vui lòng thử lại.",
+    "copiedInline": "Đã sao chép"
+  },
+  "options": {
+    "close": "Đóng",
+    "toggle": "Bật / Tắt Wi-Fi",
+    "edit": "Đổi tên / Mật khẩu Wi-Fi",
+    "copy": "Sao chép mật khẩu Wi-Fi",
+    "share": "Chia sẻ Wi-Fi (QR code)"
+  },
+  "toggle": {
+    "label": "Bật / Tắt {{ssid}}",
+    "confirmTitle": "Tắt Wi-Fi {{ssid}}?",
+    "confirmDescription": "Mọi thiết bị đang dùng Wi-Fi này sẽ mất kết nối, kể cả điện thoại này nếu đang kết nối vào {{ssid}}.",
+    "confirm": "Tắt Wi-Fi",
+    "cancel": "Huỷ",
+    "turnedOn": "Đã bật Wi-Fi {{ssid}}",
+    "turnedOff": "Đã tắt Wi-Fi {{ssid}}"
+  },
+  "command": {
+    "sent": "Đã gửi yêu cầu, đang chờ modem xác nhận",
+    "failed": "Chưa áp dụng được thay đổi cho {{ssid}}. {{reason}}"
+  },
+  "edit": {
+    "ssid": "Tên Wi-fi (SSID)",
+    "password": "Mật khẩu Wi-fi",
+    "passwordPlaceholder": "••••••••",
+    "passwordHelper": "Để trống nếu không đổi mật khẩu. Từ 8 đến 63 ký tự, không dấu.",
+    "save": "Lưu thay đổi",
+    "applying": "Đang áp dụng…",
+    "notFound": "Không tìm thấy mạng Wi-Fi này.",
+    "confirmTitle": "Lưu thay đổi Wi-Fi?",
+    "confirmDescription": "Các thiết bị đang kết nối sẽ cần kết nối lại bằng tên hoặc mật khẩu mới, kể cả điện thoại này nếu đang dùng Wi-Fi này.",
+    "confirm": "Lưu",
+    "cancel": "Huỷ",
+    "saved": "Đã lưu thay đổi Wi-Fi",
+    "failed": "Chưa lưu được thay đổi. {{reason}}",
+    "errors": {
+      "ssidRequired": "Vui lòng nhập tên Wi-Fi.",
+      "ssidTooLong": "Tên Wi-Fi tối đa 32 ký tự.",
+      "ssidInvalid": "Tên Wi-Fi có ký tự không hợp lệ.",
+      "passwordLength": "Mật khẩu cần từ 8 đến 63 ký tự.",
+      "passwordInvalid": "Mật khẩu chỉ gồm chữ không dấu, số và ký tự đặc biệt thông dụng."
+    }
+  },
+  "qr": {
+    "loading": "Đang tạo mã QR",
+    "imageAlt": "Mã QR kết nối Wi-Fi {{ssid}}",
+    "hint": "Quét mã QR bằng camera điện thoại để kết nối Wi‑fi này",
+    "warning": "Mã QR chứa mật khẩu Wi-Fi. Chỉ chia sẻ cho người bạn tin tưởng.",
+    "disabledNotice": "Wi-Fi này đang tắt. Thiết bị khác chỉ kết nối được sau khi bật lại.",
+    "save": "Lưu ảnh QR",
+    "share": "Chia sẻ",
+    "shareText": "Kết nối Wi-Fi {{ssid}}",
+    "saved": "Đã lưu ảnh QR",
+    "fileName": "wifi-{{ssid}}.png",
+    "error": "Chưa tạo được mã QR. Vui lòng thử lại.",
+    "notFound": "Không tìm thấy mạng Wi-Fi này."
+  }
+}

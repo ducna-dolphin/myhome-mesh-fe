@@ -1,0 +1,14 @@
+.quality-tab {
+  display: grid;
+  gap: var(--space-3);
+}
+.quality-tab__results {
+  display: grid;
+  gap: var(--space-3);
+}
+.quality-tab__results-title {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}

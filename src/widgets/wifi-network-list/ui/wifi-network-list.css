@@ -1,0 +1,144 @@
+.wifi-list {
+  display: grid;
+  gap: var(--space-3);
+}
+.wifi-list__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.wifi-list__title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+}
+.wifi-list__loading,
+.wifi-list__items {
+  display: grid;
+  gap: var(--space-3);
+}
+.wifi-list__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---- Card ---- */
+.wifi-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+.wifi-card__icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-brand-soft);
+  color: var(--color-icon-wifi);
+}
+.wifi-card.is-disabled .wifi-card__icon {
+  background: var(--color-track);
+  color: var(--color-text-muted);
+}
+.wifi-card__body {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: var(--space-2);
+  padding-right: var(--space-6);
+}
+.wifi-card__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.wifi-card__ssid {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wifi-card__status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-caption);
+}
+.wifi-card__status.is-on {
+  color: var(--color-online-fg);
+}
+.wifi-card__status.is-off {
+  color: var(--color-text-muted);
+}
+.wifi-card__status.is-applying {
+  color: var(--color-brand);
+}
+.wifi-card__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.wifi-card__status.is-on .wifi-card__dot {
+  background: var(--color-online);
+}
+/* Stretched hit area over the whole card; the password field sits above it (z-index). */
+.wifi-card__open {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: var(--color-chevron);
+  cursor: pointer;
+}
+.wifi-card__open:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+/* Pressed: the whole card dips, wherever the finger landed (except the eye button). */
+.wifi-card {
+  cursor: pointer;
+  transition:
+    transform var(--duration-instant) var(--ease-standard),
+    background-color var(--duration-instant) var(--ease-standard);
+}
+.wifi-card:active:not(:has(.wifi-card__password button:active)) {
+  transform: scale(0.98);
+  background: var(--color-input);
+}
+/* The password row is part of the card's tap target; only its eye button stays interactive. */
+.wifi-card__password {
+  pointer-events: none;
+}
+.wifi-card__password button {
+  pointer-events: auto;
+}
+
+/* ---- Options sheet ---- */
+.wifi-options__rows {
+  display: grid;
+}
+.wifi-list__skeleton {
+  border-radius: var(--radius-md);
+}

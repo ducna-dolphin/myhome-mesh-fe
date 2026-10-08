@@ -1,0 +1,54 @@
+/*
+ * Shared motion vocabulary. Base styles are always the final state; these keyframes only add the
+ * `from` state, so content stays visible when animations do not run.
+ */
+
+/* List entrance (first data load only, see useEntranceOnce). Set `--i` per item. */
+.ui-stagger > * {
+  animation: ui-rise var(--duration-base) var(--ease-out-quart) both;
+  animation-delay: calc(min(var(--i, 0), 7) * var(--stagger-step));
+}
+
+/* Inserted / removed items of useAnimatedList. */
+.ui-enter {
+  animation: ui-pop-in var(--duration-base) var(--ease-out-quint) both;
+}
+.ui-leave {
+  pointer-events: none;
+  animation: ui-pop-out var(--duration-exit) var(--ease-exit) both;
+}
+
+/* Swap of an icon in place (eye ↔ eye-off, copy → check): key the icon to replay it. */
+.ui-icon-swap {
+  animation: ui-icon-in var(--duration-fast) var(--ease-out-quint) both;
+}
+
+@keyframes ui-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes ui-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ui-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+@keyframes ui-pop-out {
+  to {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+@keyframes ui-icon-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-12deg);
+  }
+}

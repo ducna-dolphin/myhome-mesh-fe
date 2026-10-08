@@ -1,0 +1,69 @@
+.wifi-qr {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+.wifi-qr__code {
+  width: 200px;
+  height: 200px;
+  display: grid;
+  place-items: center;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+.wifi-qr__image {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+.wifi-qr__info {
+  display: grid;
+  gap: var(--space-1);
+}
+.wifi-qr__ssid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+.wifi-qr__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+}
+.wifi-qr__warning,
+.wifi-qr__notice {
+  /* Anchor for the SpecNote tooltip. */
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-caption);
+  text-align: left;
+}
+.wifi-qr__warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-fg);
+}
+.wifi-qr__notice {
+  background: var(--color-input);
+  color: var(--color-text-2);
+}
+.wifi-qr__actions {
+  width: 100%;
+  display: grid;
+  gap: var(--space-3);
+}
+.wifi-qr__actions a.ui-button {
+  text-decoration: none;
+}

@@ -1,0 +1,78 @@
+.ui-segmented-tabs {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-track);
+}
+/* One pill slides to the selected tab (transform + width, measured in JS). */
+.ui-segmented-tabs__indicator {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  width: var(--indicator-width, 0px);
+  border-radius: var(--radius-pill);
+  background: var(--color-brand);
+  opacity: 0;
+  transform: translateX(var(--indicator-x, 0px));
+  pointer-events: none;
+}
+.ui-segmented-tabs.has-indicator .ui-segmented-tabs__indicator {
+  opacity: 1;
+}
+.ui-segmented-tabs.is-animated .ui-segmented-tabs__indicator {
+  transition:
+    transform var(--duration-base) var(--ease-out-quint),
+    width var(--duration-base) var(--ease-out-quint);
+}
+.ui-segmented-tabs__tab {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: calc(var(--size-tab) - 6px);
+  display: grid;
+  place-items: center;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard),
+    transform var(--duration-instant) var(--ease-standard);
+}
+/* 30px visual, ≥44px touch target. */
+.ui-segmented-tabs__tab::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
+}
+.ui-segmented-tabs__tab.is-selected {
+  color: var(--color-on-brand);
+}
+/* Before the indicator is measured (first paint, no layout) the tab paints its own pill. */
+.ui-segmented-tabs:not(.has-indicator) .ui-segmented-tabs__tab.is-selected {
+  background: var(--color-brand);
+}
+.ui-segmented-tabs__tab:active:not(.is-selected) {
+  transform: scale(var(--press-scale));
+}
+.ui-segmented-tabs__tab:focus-visible {
+  outline-offset: 0;
+}
+/* 360px phones: four Vietnamese labels must fit without a horizontal page scroll. */
+@media (max-width: 379px) {
+  .ui-segmented-tabs {
+    gap: 0;
+  }
+  .ui-segmented-tabs__tab {
+    padding: 0 var(--space-1);
+    letter-spacing: -0.01em;
+  }
+}

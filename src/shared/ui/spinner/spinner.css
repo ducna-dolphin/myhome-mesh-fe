@@ -1,0 +1,19 @@
+.ui-spinner {
+  display: inline-block;
+  flex: 0 0 auto;
+  border: 2px solid currentcolor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ui-spin 700ms linear infinite;
+}
+@keyframes ui-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Keep a static, partially open ring so the busy state still reads without motion. */
+  .ui-spinner {
+    animation: none;
+  }
+}

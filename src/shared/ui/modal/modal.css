@@ -1,0 +1,65 @@
+/*
+ * Shared full-screen layer for BottomSheet and Dialog. The <dialog> element itself covers the
+ * viewport (so a click on it = a click on the scrim) and the visible panel sits inside it.
+ */
+.ui-modal {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  overflow: hidden;
+  /*
+   * clip, not a scroll container: showModal() focuses the first control and would otherwise
+   * scroll the layer to it while the panel is still translated off-screen, cancelling the slide-in.
+   */
+  overflow: clip;
+}
+.ui-modal[open] {
+  display: flex;
+}
+.ui-modal:not([open]) {
+  display: none;
+}
+.ui-modal::backdrop {
+  background: var(--color-scrim);
+  animation: ui-modal-fade var(--duration-base) var(--ease-out-quart);
+}
+/* Exit (`data-state="closing"` while the panel animates out): the scrim fades with it. */
+.ui-modal[data-state='closing']::backdrop {
+  animation: ui-modal-fade-out var(--duration-exit) var(--ease-exit) forwards;
+}
+/* Fallback when showModal() is unavailable: the element draws its own scrim and stacks itself. */
+.ui-modal--fallback {
+  z-index: var(--z-dialog);
+  background: var(--color-scrim);
+  animation: ui-modal-fade var(--duration-base) var(--ease-out-quart);
+}
+.ui-modal--fallback[data-state='closing'] {
+  animation: ui-scrim-out var(--duration-exit) var(--ease-exit) forwards;
+}
+.ui-modal:focus-visible {
+  outline: none;
+}
+
+@keyframes ui-modal-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ui-modal-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes ui-scrim-out {
+  to {
+    background-color: transparent;
+  }
+}

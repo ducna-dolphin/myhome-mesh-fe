@@ -1,0 +1,26 @@
+.device-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+.device-status__dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: var(--color-text-disabled);
+}
+.device-status--connected {
+  color: var(--color-online-fg);
+}
+.device-status--connected .device-status__dot {
+  background: var(--color-online);
+}
+.device-status--blocked {
+  color: var(--color-danger-fg);
+}
+.device-status--blocked .device-status__dot {
+  background: var(--color-danger);
+}

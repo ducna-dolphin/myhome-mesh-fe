@@ -1,0 +1,26 @@
+.block-device-card {
+  display: grid;
+  gap: var(--space-2);
+  padding-block: var(--space-3);
+}
+.block-device-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--size-touch);
+}
+.card h2.block-device-card__label {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+}
+.block-device-card__hint,
+.block-device-card__status {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-normal);
+}
+.block-device-card__status {
+  color: var(--color-warning-fg);
+}

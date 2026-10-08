@@ -1,0 +1,40 @@
+/* Shimmer: a soft highlight sweeps across on `transform` (compositor only, no repaint). */
+.ui-skeleton {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--color-track);
+}
+.ui-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, var(--color-surface) 50%, transparent 100%);
+  opacity: 0.55;
+  transform: translateX(-100%);
+  animation: ui-skeleton-shimmer 1.6s var(--ease-standard) infinite;
+}
+.ui-skeleton--rect {
+  border-radius: var(--radius-sm);
+}
+.ui-skeleton--text {
+  border-radius: var(--space-1);
+}
+.ui-skeleton--circle {
+  border-radius: 50%;
+}
+.ui-skeleton--pill {
+  border-radius: var(--radius-pill);
+}
+
+@keyframes ui-skeleton-shimmer {
+  60%,
+  to {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-skeleton::after {
+    display: none;
+  }
+}

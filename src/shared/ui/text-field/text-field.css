@@ -1,0 +1,146 @@
+.ui-text-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.ui-text-field__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.ui-text-field__label {
+  color: var(--color-text-2);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+}
+.ui-text-field__counter {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+/* Close to maxLength: the counter warns before the input silently stops accepting text. */
+.ui-text-field__counter.is-near-limit {
+  color: var(--color-warning-fg);
+  font-weight: var(--font-weight-semibold);
+}
+.ui-text-field__control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--size-control);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-input);
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+.ui-text-field__control:focus-within {
+  /* Border + 1px shadow = 2px brand focus ring around the whole control. */
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 1px var(--color-brand);
+}
+.ui-text-field__input {
+  flex: 1;
+  min-width: 0;
+  height: calc(var(--size-control) - 2px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--font-size-subheading);
+}
+/* The wrapper draws the focus ring for the whole control. */
+.ui-text-field__input:focus-visible {
+  outline: none;
+}
+.ui-text-field__input::placeholder {
+  color: var(--color-text-disabled);
+}
+.ui-text-field__affix {
+  flex: 0 0 auto;
+  color: var(--color-text-2);
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-medium);
+}
+.ui-text-field__reveal {
+  width: var(--size-touch);
+  height: var(--size-touch);
+  margin-right: calc(-1 * var(--space-2));
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+/* 20px grey dot, 44px hit area (negative margin keeps the control height). */
+.ui-text-field__clear {
+  width: var(--size-touch);
+  height: var(--size-touch);
+  flex: 0 0 auto;
+  margin: 0 calc(-1 * var(--space-3)) 0 calc(-1 * var(--space-2));
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-surface);
+  cursor: pointer;
+  animation: ui-icon-in var(--duration-fast) var(--ease-out-quint);
+}
+.ui-text-field__clear-dot {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-text-disabled);
+  transition:
+    transform var(--duration-instant) var(--ease-standard),
+    background-color var(--duration-instant) var(--ease-standard);
+}
+.ui-text-field__clear:active .ui-text-field__clear-dot {
+  transform: scale(0.88);
+  background: var(--color-text-muted);
+}
+.ui-text-field__clear:focus-visible {
+  outline-offset: -6px;
+}
+/* A suffix or reveal button after the clear button keeps its own spacing. */
+.ui-text-field__clear:not(:last-child) {
+  margin-right: 0;
+}
+.ui-text-field__message {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-normal);
+}
+.ui-text-field__message--error {
+  color: var(--color-danger-fg);
+}
+.ui-text-field.is-invalid .ui-text-field__control {
+  border-color: var(--color-danger);
+}
+.ui-text-field.is-invalid .ui-text-field__control:focus-within {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 1px var(--color-danger);
+}
+.ui-text-field.is-disabled .ui-text-field__control {
+  background: var(--color-track);
+}
+.ui-text-field.is-disabled .ui-text-field__input {
+  color: var(--color-text-muted);
+}
+.ui-text-field__reveal:active:not(:disabled) {
+  background: var(--color-track);
+}

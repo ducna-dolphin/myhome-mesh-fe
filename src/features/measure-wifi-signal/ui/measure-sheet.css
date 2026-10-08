@@ -1,0 +1,366 @@
+.measure-sheet {
+  display: grid;
+  gap: var(--space-4);
+}
+.measure-sheet__tools {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  margin-top: calc(-1 * var(--space-2));
+}
+
+/* Status block: icon ring, title, hint, progress. */
+.measure-status {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  text-align: center;
+}
+.measure-status__icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: var(--space-2);
+  border-radius: 50%;
+  background: var(--color-brand-soft);
+}
+.measure-status__icon-inner {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 2px solid var(--color-brand);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-brand);
+}
+.measure-status__icon--busy .measure-status__icon-inner {
+  border-color: var(--color-brand-soft);
+  border-top-color: var(--color-brand);
+  animation: measure-spin 1s linear infinite;
+}
+.measure-status__icon--busy .ui-icon {
+  animation: measure-spin 1s linear infinite reverse;
+}
+.measure-status__icon--problem {
+  background: var(--color-danger-bg);
+}
+.measure-status__icon--problem .measure-status__icon-inner {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+.measure-status__title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-semibold);
+}
+.measure-status__hint,
+.measure-status__note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+}
+.measure-status__note {
+  font-size: var(--font-size-caption);
+}
+.measure-status__level {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+.measure-status__level--good {
+  color: var(--color-signal-good-fg);
+}
+.measure-status__level--fair {
+  color: var(--color-signal-fair-fg);
+}
+.measure-status__level--weak {
+  color: var(--color-signal-weak-fg);
+}
+.measure-status__badge {
+  margin-top: var(--space-1);
+}
+.measure-status__progress {
+  width: 100%;
+  height: 4px;
+  margin-top: var(--space-3);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-track);
+}
+.measure-status__progress-fill {
+  display: block;
+  height: 100%;
+  background: var(--color-brand);
+  transform: scaleX(0);
+  transform-origin: left;
+  /* Progress is continuous time, so a linear tween between 200ms ticks is the honest curve. */
+  transition: transform 200ms linear;
+}
+
+@keyframes measure-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .measure-status__icon--busy .measure-status__icon-inner,
+  .measure-status__icon--busy .ui-icon {
+    animation: none;
+  }
+}
+
+/* ---- Signature: radar while measuring ---- */
+.measure-radar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  margin-bottom: var(--space-2);
+}
+.measure-radar__core {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  box-shadow: 0 0 0 6px var(--color-brand-soft);
+  animation: measure-core-breathe 1.8s var(--ease-standard) infinite;
+}
+.measure-radar__ring {
+  position: absolute;
+  inset: 20px;
+  border: 2px solid var(--color-brand);
+  border-radius: 50%;
+  opacity: 0;
+  animation: measure-radar-pulse 1.8s var(--ease-out-quart) infinite;
+}
+.measure-radar__ring:nth-child(2) {
+  animation-delay: 0.6s;
+}
+.measure-radar__ring:nth-child(3) {
+  animation-delay: 1.2s;
+}
+@keyframes measure-radar-pulse {
+  from {
+    opacity: 0.55;
+    transform: scale(0.75);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+@keyframes measure-core-breathe {
+  50% {
+    transform: scale(1.04);
+  }
+}
+/* Reduced motion: one static ring tells "measuring" without movement. */
+@media (prefers-reduced-motion: reduce) {
+  .measure-radar__ring,
+  .measure-radar__core {
+    animation: none;
+  }
+  .measure-radar__ring:first-child {
+    opacity: 0.35;
+    transform: scale(1.3);
+  }
+}
+
+/* ---- Signature: result reveal ---- */
+.measure-status--reveal .measure-status__icon {
+  animation: measure-check-pop var(--duration-slow) var(--ease-out-expo) both;
+}
+.measure-status--reveal .measure-status__level-label,
+.measure-status--reveal .measure-status__title,
+.measure-status--reveal .measure-status__hint,
+.measure-status--reveal .measure-status__note,
+.measure-status--reveal .measure-status__badge {
+  animation: ui-rise var(--duration-base) var(--ease-out-quart) both;
+  /* After the three bars have filled. */
+  animation-delay: calc(var(--duration-base) * 1.6);
+}
+.measure-status--reveal .measure-status__title {
+  animation-delay: var(--duration-fast);
+}
+@keyframes measure-check-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+/* History (LS-04). */
+.measure-history {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-divider);
+}
+.measure-history__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-semibold);
+}
+.measure-history__subtitle {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+}
+.measure-history__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.measure-history__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  border-bottom: 1px solid var(--color-divider);
+}
+.measure-history__row:last-child {
+  border-bottom: 0;
+}
+.measure-history__level {
+  font-weight: var(--font-weight-semibold);
+}
+.measure-history__level--good {
+  color: var(--color-signal-good-fg);
+}
+.measure-history__level--fair {
+  color: var(--color-signal-fair-fg);
+}
+.measure-history__level--weak {
+  color: var(--color-signal-weak-fg);
+}
+.measure-history__time {
+  margin-left: auto;
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  font-variant-numeric: tabular-nums;
+}
+
+/* iPhone manual flow (P2-04). */
+.manual-intro {
+  display: grid;
+  gap: var(--space-3);
+}
+.manual-intro__heading {
+  margin: 0;
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-semibold);
+}
+.manual-intro__caps {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+}
+.manual-intro__short {
+  margin: 0;
+  color: var(--color-text-2);
+  line-height: var(--line-height-normal);
+}
+.manual-app {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.manual-app__icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--color-input);
+  color: var(--color-brand);
+}
+.manual-app__text {
+  display: grid;
+  gap: 2px;
+}
+.manual-app__title {
+  font-weight: var(--font-weight-semibold);
+}
+.manual-app__subtitle {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+.manual-steps {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.manual-steps__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  line-height: var(--line-height-normal);
+}
+.manual-steps__number {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-brand);
+  border-radius: 50%;
+  color: var(--color-brand);
+  font-size: var(--font-size-caption);
+}
+.manual-link {
+  justify-self: start;
+  min-height: var(--size-touch);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-brand);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.manual-link--center {
+  justify-self: center;
+}
+.rssi-form {
+  display: grid;
+  gap: var(--space-3);
+}
+.rssi-form__preview {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+.rssi-form__preview--good {
+  color: var(--color-signal-good-fg);
+}
+.rssi-form__preview--fair {
+  color: var(--color-signal-fair-fg);
+}
+.rssi-form__preview--weak {
+  color: var(--color-signal-weak-fg);
+}
+.rssi-form__links {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}

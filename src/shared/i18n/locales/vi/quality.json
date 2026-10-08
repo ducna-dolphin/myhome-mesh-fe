@@ -1,0 +1,84 @@
+{
+  "title": "Chất lượng đường truyền",
+  "step": {
+    "INTERNET_LINE": "Đường truyền",
+    "WIFI_SIGNAL": "Sóng Wi-fi",
+    "CONNECTED_DEVICES": "Thiết bị kết nối",
+    "a11y": "{{name}}: {{state}}",
+    "stateDone": "Đã xong",
+    "stateRunning": "Đang kiểm tra",
+    "statePending": "Chưa tới lượt",
+    "stateFailed": "Chưa kiểm tra được"
+  },
+  "header": {
+    "running": "Đang kiểm tra...",
+    "runningHint": "Vui lòng đợi trong giây lát",
+    "done": "Hoàn tất kiểm tra",
+    "lastChecked": "Đo lần gần nhất {{time}}",
+    "recheck": "Kiểm tra lại",
+    "progress": "Tiến độ kiểm tra",
+    "timeout": "Kiểm tra mất nhiều thời gian hơn dự kiến. Vui lòng thử lại sau.",
+    "startError": "Chưa bắt đầu kiểm tra được."
+  },
+  "overall": {
+    "NO_ISSUE": "Không phát hiện lỗi",
+    "ISSUES_FOUND": "Phát hiện {{n}} vấn đề",
+    "INCOMPLETE": "Chưa kiểm tra được đầy đủ"
+  },
+  "resultsTitle": "Kết quả kiểm tra",
+  "item": {
+    "INTERNET_LINE": "Đường truyền Internet",
+    "WIFI_SIGNAL": "Sóng Wifi",
+    "CONNECTED_DEVICES": "Thiết bị kết nối"
+  },
+  "state": {
+    "PENDING": "Chờ bước trước xong",
+    "RUNNING": "Đang kiểm tra…",
+    "FAILED": "Chưa kiểm tra được phần này"
+  },
+  "status": {
+    "STABLE": "Ổn định",
+    "UNSTABLE": "Chập chờn",
+    "DISCONNECTED": "Mất kết nối",
+    "PASS": "Đạt",
+    "FAIL": "Chưa đạt",
+    "OFF": "Không có"
+  },
+  "detail": {
+    "STABLE": "hôm nay không lần nào rớt mạng",
+    "UNSTABLE": "hôm nay rớt mạng {{n}} lần",
+    "DISCONNECTED": "Vui lòng kiểm tra lại nguồn Modem",
+    "PASS": "sóng phủ đều trong nhà",
+    "FAIL": "có chỗ trong nhà sóng còn yếu",
+    "OFF": "Wi-Fi đang tắt",
+    "NORMAL": "{{n}} thiết bị đang dùng mạng",
+    "HOGGED": "{{name}} đang chiếm {{percent}}% đường truyền",
+    "HOGGED_unnamed": "Một thiết bị đang chiếm {{percent}}% đường truyền",
+    "HOGGED_crowded": "{{n}} thiết bị đang dùng mạng, nhiều hơn mức khuyến nghị"
+  },
+  "action": {
+    "RESET_MODEM": "Reset Modem ngay",
+    "REPORT_FAULT": "Báo hỏng",
+    "ENABLE_WIFI": "Bật Wi-Fi",
+    "ORDER_MESH": "Đặt lắp thêm Mesh",
+    "OPEN_DEVICES_TAB": "Xem thiết bị kết nối"
+  },
+  "resetModem": {
+    "title": "Reset Modem ngay?",
+    "description": "Mạng Internet và Wi-Fi sẽ gián đoạn khoảng 2 phút trong lúc modem khởi động lại. Sau khi modem lên lại, hệ thống sẽ tự kiểm tra lại."
+  },
+  "reportFault": {
+    "success": "Đã ghi nhận báo hỏng. Mã phiếu: {{ticketCode}}",
+    "error": "Chưa gửi được báo hỏng. Vui lòng thử lại sau."
+  },
+  "enableWifi": {
+    "running": "Đang bật Wi-Fi…",
+    "done": "Đã bật Wi-Fi. Đang kiểm tra lại…",
+    "failed": "Chưa bật được Wi-Fi. Vui lòng thử lại sau.",
+    "retryAfter": "Modem đang bận. Vui lòng thử lại sau {{seconds}} giây."
+  },
+  "orderMesh": {
+    "unsupported": "Phiên bản ứng dụng MyHome chưa hỗ trợ đặt lắp Mesh.",
+    "openFailed": "Chưa mở được trang đặt lắp Mesh. Vui lòng thử lại."
+  }
+}

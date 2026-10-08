@@ -1,0 +1,47 @@
+{
+  "app": {
+    "fatalError": "Có lỗi xảy ra khi hiển thị miniapp."
+  },
+  "action": {
+    "back": "Quay lại",
+    "retry": "Thử lại",
+    "close": "Đóng",
+    "cancel": "Huỷ",
+    "clearField": "Xoá nội dung {{label}}"
+  },
+  "state": {
+    "loading": "Đang tải dữ liệu mạng...",
+    "genericError": "Không thể tải dữ liệu. Vui lòng thử lại.",
+    "staleAt": "Cập nhật lúc {{time}}",
+    "staleUnknown": "Dữ liệu có thể chưa được cập nhật",
+    "sectionError": "Chưa tải được phần này.",
+    "notAvailable": "—"
+  },
+  "error": {
+    "unauthorized": "Phiên đăng nhập đã hết hạn.",
+    "forbidden": "Bạn không có quyền thực hiện thao tác này.",
+    "notFound": "Không tìm thấy dữ liệu yêu cầu.",
+    "timeout": "Thiết bị phản hồi chậm, vui lòng thử lại sau.",
+    "deviceOffline": "Thiết bị đang mất kết nối.",
+    "validation": "Dữ liệu trả về không hợp lệ.",
+    "server": "Hệ thống đang bận. Vui lòng thử lại sau.",
+    "network": "Không thể kết nối đến hệ thống."
+  },
+  "route": {
+    "internet": "Internet",
+    "wifiNetworkEdit": "Đổi tên / mật khẩu Wi-Fi",
+    "wifiNetworkShare": "Chia sẻ Wi-Fi",
+    "deviceDetail": "Chi tiết thiết bị",
+    "deviceEdit": "Đổi tên / biểu tượng"
+  },
+  "specNote": {
+    "label": "Cần thống nhất"
+  },
+  "password": {
+    "show": "Hiện mật khẩu",
+    "hide": "Ẩn mật khẩu"
+  },
+  "bridge": {
+    "failed": "Không thể mở. Vui lòng thử lại."
+  }
+}

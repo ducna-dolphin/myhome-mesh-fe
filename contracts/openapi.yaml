@@ -1,0 +1,1378 @@
+openapi: 3.1.0
+info:
+  title: MyHome — API cho MiniApp Quản lý Internet
+  version: 1.0.0-draft
+  description: |
+    API backend MyHome cho MiniApp Quản lý Internet (`link-svc`, `mesh-svc`). Bản nháp LLD, đề xuất của nhóm, chốt khi review.
+    Gồm API của mọi nghiệp vụ M1 (README mục 3). Lịch bật tắt Wi-Fi (P3-03, P3-04) tạm bỏ nên không có ở đây.
+
+    Theo `common-format.md` (CF):
+    - Phản hồi thành công bọc `{ data, meta?, errors? }`; lỗi bọc `{ error }` (CF §2.2, §3.1). Không dùng `204`.
+    - Mọi thao tác ghi bắt buộc `Idempotency-Key` (CF §2.3), phạm vi `(app_user_id, Idempotency-Key)` vì MiniApp không dùng nhóm gia đình (không có `X-Group-Id`).
+    - Lệnh ghi xuống modem trả `202` + `Location: /mesh/v1/commands/{commandId}` (CF §2.4, LLD P0-04).
+    - Thời điểm là RFC 3339 UTC; Thiếu dữ liệu trả `null`.
+    - Không phân trang: mọi danh sách nhỏ và có giới hạn (CF §2.5).
+    - Mọi yêu cầu có `serialNumber` hoặc `contractId` kiểm tra quyền sở hữu; không thuộc người gọi thì `404 NOT_FOUND`.
+servers:
+  - url: https://api.myhome.vn
+security:
+  - bearerAuth: []
+tags:
+  - name: P0 Nền tảng chung
+  - name: P1 Truy cập và hợp đồng
+  - name: P2 Sóng Wi-Fi nhà tôi
+  - name: P3 Quản lý Wi-Fi
+  - name: P4 Thiết bị kết nối
+  - name: P5 Modem
+  - name: P6 Chất lượng đường truyền
+
+paths:
+  # ---------------- P0 ----------------
+  /mesh/v1/commands/{commandId}:
+    get:
+      operationId: getCommand
+      tags: [P0 Nền tảng chung]
+      summary: Trạng thái lệnh ghi (P0-04)
+      description: MiniApp hỏi lại sau `retryAfterSec` cho tới khi `CONFIRMED` hoặc `FAILED`. Chỉ người tạo lệnh xem được.
+      parameters:
+        - $ref: '#/components/parameters/CommandId'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Trạng thái hiện tại của lệnh
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/Command' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /mesh/v1/devices/{serialNumber}/commands:
+    get:
+      operationId: listActiveCommands
+      tags: [P0 Nền tảng chung]
+      summary: Lệnh ghi còn đang chạy của modem (P0-04)
+      description: MiniApp gọi khi mở lại để tiếp tục theo dõi lệnh (ví dụ đang khởi động lại). Chỉ trả lệnh do người gọi tạo, trạng thái `PENDING`, `SENT`, `UNKNOWN`.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - name: active
+          in: query
+          required: true
+          schema: { type: boolean, enum: [true] }
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Các lệnh còn chạy, có thể rỗng
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Command' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ---------------- P1 ----------------
+  /link/v1/mini-app-sessions:
+    post:
+      operationId: createMiniAppSession
+      tags: [P1 Truy cập và hợp đồng]
+      summary: Cấp token MiniApp và tra hợp đồng (P0-01, P1-01)
+      description: |
+        **Super app (native) gọi** bằng token SC trước khi mở WebView; trang MiniApp không gọi API này (sso-token.md mục 2). Tên API là đề xuất.
+        Backend xác minh token SC bằng JWKS (sso-token.md mục 3), đọc `app_user_id` và `phone`; chưa tra trong 10 phút hoặc `phone` đổi thì tra OneBSS theo `phone` (đổi sang `84xxxxxxxxx`), lưu hợp đồng Internet (`loaitb_id` = 58) và thiết bị. OneBSS lỗi vẫn cấp token; `GET /link/v1/contract-links` báo lỗi hoặc trả bản cũ.
+      security:
+        - scToken: []
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [miniAppId]
+              properties:
+                miniAppId: { type: string, examples: [mesh-wifi] }
+      responses:
+        '200':
+          description: Token MiniApp
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [accessToken, tokenType, expiresIn]
+                    properties:
+                      accessToken: { type: string }
+                      tokenType: { type: string, enum: [Bearer] }
+                      expiresIn: { type: integer, description: 'Số giây còn hiệu lực (đề xuất 900). Giữ tên theo quy ước OAuth, ngoại lệ CF §2.1 (README mục 5)' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  /link/v1/contract-links:
+    get:
+      operationId: listContractLinks
+      tags: [P1 Truy cập và hợp đồng]
+      summary: Hợp đồng Internet của người gọi (P1-01)
+      description: |
+        Đọc hợp đồng Internet đã tra theo `phone` trong token SC lúc cấp token MiniApp (`POST /link/v1/mini-app-sessions`), theo `app_user_id` của người gọi; API này không gọi OneBSS (PERM-11; TC-02, TC-05, TC-06; Q-18, Q-49).
+        Trả `[]` khi chưa có hợp đồng: MiniApp hiện màn "Chưa có dịch vụ Internet". Lần tra gần nhất lỗi thì trả bản cũ kèm `meta.stale`; không có bản cũ thì trả `503`, không kết luận là chưa có hợp đồng. Thử lại bằng cách xin token MiniApp mới.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Danh sách hợp đồng
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/ContractLink' }
+                  meta: { $ref: '#/components/schemas/ReadMeta' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+
+  /link/v1/contract-links/{contractId}:
+    get:
+      operationId: getContractLink
+      tags: [P1 Truy cập và hợp đồng]
+      summary: Thẻ hợp đồng và dữ liệu dùng khi đo (P1-02)
+      description: |
+        Thẻ hợp đồng trên màn chính (TC-07) và dữ liệu đối chiếu điều kiện đo (DK-02, DK-05, QD-02).
+        Nguồn thanh toán chưa rõ (Q-47): `billing` có thể `null`; nguồn lỗi thì ghi vào `errors[]` với `target` = `billing`.
+      parameters:
+        - $ref: '#/components/parameters/ContractId'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Chi tiết hợp đồng
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/ContractLinkDetail' }
+                  meta: { $ref: '#/components/schemas/ReadMeta' }
+                  errors: { $ref: '#/components/schemas/PartialErrors' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+
+  /link/v1/contract-links/{contractId}/fault-reports:
+    post:
+      operationId: createFaultReport
+      tags: [P6 Chất lượng đường truyền]
+      summary: Báo hỏng đường truyền (P6-01)
+      description: |
+        Nút "Báo hỏng" khi đường truyền Mất kết nối. `link-svc` gọi API tiếp nhận báo hỏng của OneBSS (SRC-BRCD §II.5) cho thuê bao Internet của hợp đồng. **Đề xuất**, chờ B-09.
+      parameters:
+        - $ref: '#/components/parameters/ContractId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                checkId: { type: [string, 'null'], format: uuid, description: Lượt kiểm tra làm căn cứ }
+      responses:
+        '201':
+          description: Đã tạo phiếu
+          headers:
+            Location: { $ref: '#/components/headers/Location' }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [ticketCode]
+                    properties:
+                      ticketCode: { type: string, description: Mã phiếu báo hỏng của OneBSS }
+                      createdAt: { type: string, format: date-time }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+
+  /link/v1/contract-links/{contractId}/select:
+    post:
+      operationId: selectContractLink
+      tags: [P1 Truy cập và hợp đồng]
+      summary: Chọn hoặc đổi hợp đồng (P1-02)
+      description: Chọn hợp đồng bằng danh sách thả xuống trong khối "Thông tin hợp đồng". Mỗi `app_user_id` có một hợp đồng đang chọn (PERM-11, Q-18). Thao tác xong ngay nên trả `200`.
+      parameters:
+        - $ref: '#/components/parameters/ContractId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Đã chọn
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/ContractLink' }
+        '400': { $ref: '#/components/responses/IdempotencyKeyRequired' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/RequestInProgress' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+
+  # ---------------- P2 ----------------
+  /mesh/v1/measurement-locations:
+    get:
+      operationId: listMeasurementLocations
+      tags: [P2 Sóng Wi-Fi nhà tôi]
+      summary: Lưới vị trí đo (P2-01)
+      description: |
+        Sắp xếp Yếu → Trung bình → Tốt → chưa đo (VT-04); mỗi ô kèm kết quả lần đo gần nhất (VT-05).
+        MiniApp tự hiện khối khuyến nghị lắp thêm Mesh khi có `latestLevel` = `WEAK` (§IV.2.8).
+      parameters:
+        - $ref: '#/components/parameters/ContractIdQuery'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Danh sách vị trí, tối đa 20
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    maxItems: 20
+                    items: { $ref: '#/components/schemas/MeasurementLocation' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      operationId: createMeasurementLocation
+      tags: [P2 Sóng Wi-Fi nhà tôi]
+      summary: Thêm vị trí đo (P2-02)
+      description: Tối đa 20 vị trí mỗi hợp đồng, tính cả vị trí chưa đo (VT-01); tên tối đa 30 ký tự, lọc ký tự đặc biệt, không trùng (VT-02).
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contractId, name]
+              properties:
+                contractId: { type: string }
+                name: { type: string, minLength: 1, maxLength: 30 }
+      responses:
+        '201':
+          description: Đã tạo
+          headers:
+            Location: { $ref: '#/components/headers/Location' }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/MeasurementLocation' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/LocationLimitReached' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+
+  /mesh/v1/signal-thresholds:
+    get:
+      operationId: getSignalThresholds
+      tags: [P2 Sóng Wi-Fi nhà tôi]
+      summary: Ngưỡng quy đổi mức sóng (P2-03, P2-04)
+      description: Ngưỡng backend đang dùng (QD-02 đến QD-04), để MiniApp tính kết quả đo thử và xem trước mức giống backend. Khi lưu, backend tự quy đổi lại.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Ngưỡng
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/SignalThresholds' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  /mesh/v1/measurement-locations/{locationId}:
+    patch:
+      operationId: renameMeasurementLocation
+      tags: [P2 Sóng Wi-Fi nhà tôi]
+      summary: Đổi tên vị trí (P2-05)
+      description: Cùng ràng buộc tên của VT-02; giữ nguyên lịch sử đo (VT-06).
+      parameters:
+        - $ref: '#/components/parameters/LocationId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 30 }
+      responses:
+        '200':
+          description: Đã đổi tên
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/MeasurementLocation' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+    delete:
+      operationId: deleteMeasurementLocation
+      tags: [P2 Sóng Wi-Fi nhà tôi]
+      summary: Xoá vị trí (P2-05)
+      description: Đánh dấu xoá vị trí và mọi lần đo của vị trí, không khôi phục; vị trí không còn tính vào giới hạn 20 (VT-01).
+      parameters:
+        - $ref: '#/components/parameters/LocationId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Đã xoá
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      locationId: { type: string, format: uuid }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+
+  /mesh/v1/measurement-locations/{locationId}/measurements:
+    get:
+      operationId: listMeasurements
+      tags: [P2 Sóng Wi-Fi nhà tôi]
+      summary: Lịch sử đo của vị trí (P2-06)
+      description: Tối đa 5 lần đo gần nhất, mới nhất trước (LS-04). Chưa có lần đo thì trả `[]`; MiniApp không hiện khối lịch sử (LS-05).
+      parameters:
+        - $ref: '#/components/parameters/LocationId'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Lịch sử đo
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    maxItems: 5
+                    items: { $ref: '#/components/schemas/Measurement' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      operationId: createMeasurement
+      tags: [P2 Sóng Wi-Fi nhà tôi]
+      summary: Lưu kết quả đo (P2-03, P2-04)
+      description: |
+        Android gửi `downloadMbps`, `latencyMs` (QD-02, QD-03); iPhone gửi `rssiDbm` nhập từ AirPort Utility (QD-04). Backend quy đổi ra `level`.
+        Gửi lại khi mất mạng dùng lại đúng `Idempotency-Key` (LS-02). Lưu xong chỉ giữ 5 lần gần nhất (LS-04).
+        Thiếu tốc độ gói của hợp đồng (Q-48) thì trả `409 CONFLICT`.
+      parameters:
+        - $ref: '#/components/parameters/LocationId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MeasurementInput' }
+      responses:
+        '201':
+          description: Đã lưu
+          headers:
+            Location: { $ref: '#/components/headers/Location' }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/Measurement' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+
+  # ---------------- P3 ----------------
+  /mesh/v1/devices/{serialNumber}/wifi-networks:
+    get:
+      operationId: listWifiNetworks
+      tags: [P3 Quản lý Wi-Fi]
+      summary: Danh sách mạng Wi-Fi (P3-01)
+      description: Mọi mạng Wi-Fi của modem, cả mạng đang tắt (WF-01 đến WF-03); **không có mật khẩu** (CF §2.1). Không gồm mạng khách (Q-11).
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Danh sách mạng
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/WifiNetwork' }
+                  meta: { $ref: '#/components/schemas/ReadMeta' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/DeviceOffline' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+        '504': { $ref: '#/components/responses/UpstreamTimeout' }
+
+  /mesh/v1/devices/{serialNumber}/wifi-networks/{wifiIndex}:
+    patch:
+      operationId: updateWifiNetwork
+      tags: [P3 Quản lý Wi-Fi]
+      summary: Bật tắt, đổi tên, đổi mật khẩu Wi-Fi (P3-02)
+      description: |
+        Lệnh ghi xuống modem theo P0-04, đọc – sửa – ghi toàn bộ cấu hình (Q-30). Tên tối đa 32 ký tự, mật khẩu tối thiểu 8 ký tự (WF-05).
+        Điện thoại đang dùng chính mạng đó sẽ mất kết nối, nên lệnh thường kết thúc `UNKNOWN` rồi được xác nhận ở nền.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/WifiIndex'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                enabled: { type: boolean }
+                ssid: { type: string, minLength: 1, maxLength: 32 }
+                password: { type: string, minLength: 8, maxLength: 63, writeOnly: true }
+      responses:
+        '202': { $ref: '#/components/responses/CommandAccepted' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/DeviceBusy' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+
+  /mesh/v1/devices/{serialNumber}/wifi-networks/{wifiIndex}/reveal-password:
+    post:
+      operationId: revealWifiPassword
+      tags: [P3 Quản lý Wi-Fi]
+      summary: Lấy mật khẩu Wi-Fi để xem, sao chép, tạo mã QR (P3-01)
+      description: |
+        **Ngoại lệ CF §2.1 đã duyệt (2026-10-06):** URD yêu cầu xem, sao chép, chia sẻ mã QR (WF-02, WF-07).
+        Đọc thẳng từ modem, không lưu bộ nhớ đệm, ghi nhật ký vào `mesh.wifi_password_access` (không ghi mật khẩu).
+        Không đổi dữ liệu nên không cần `Idempotency-Key`. Giới hạn đề xuất 30 lần mỗi người mỗi giờ.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/WifiIndex'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                purpose:
+                  type: string
+                  enum: [VIEW, COPY, QR]
+      responses:
+        '200':
+          description: Mật khẩu
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/WifiPassword' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/DeviceOffline' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+        '504': { $ref: '#/components/responses/UpstreamTimeout' }
+
+  # ---------------- P4 ----------------
+  /mesh/v1/devices/{serialNumber}/connected-devices:
+    get:
+      operationId: listConnectedDevices
+      tags: [P4 Thiết bị kết nối]
+      summary: Danh sách thiết bị kết nối (P4-01)
+      description: |
+        Ghép từ danh sách kết nối, danh sách chặn, loại thiết bị và cấu trúc mạng Mesh (TB-01 đến TB-03). Một nguồn lỗi thì ghi vào `errors[]` với `target` (`blockList`, `fingerprint`, `topology`).
+        `getTopology` lỗi thì mọi thiết bị có `blockable` = `false`.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - name: status
+          in: query
+          required: false
+          description: Lọc theo trạng thái; bỏ trống là tất cả
+          schema: { $ref: '#/components/schemas/ConnectedDeviceStatus' }
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Danh sách thiết bị
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/ConnectedDevice' }
+                  meta: { $ref: '#/components/schemas/ReadMeta' }
+                  errors: { $ref: '#/components/schemas/PartialErrors' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/DeviceOffline' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+        '504': { $ref: '#/components/responses/UpstreamTimeout' }
+
+  /mesh/v1/devices/{serialNumber}/connected-devices/{macAddress}:
+    get:
+      operationId: getConnectedDevice
+      tags: [P4 Thiết bị kết nối]
+      summary: Chi tiết thiết bị kết nối (P4-01)
+      description: Tên, trạng thái, loại, MAC, Wi-Fi đang kết nối (TB-04). `wifiSsid` tạm `null` vì OneGate chưa trả.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/MacAddress'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Chi tiết
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/ConnectedDevice' }
+                  meta: { $ref: '#/components/schemas/ReadMeta' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      operationId: updateConnectedDevice
+      tags: [P4 Thiết bị kết nối]
+      summary: Đổi tên, icon thiết bị (P4-03)
+      description: Lưu ở MyHome, không gửi xuống modem (TB-07). Tên tối đa 32 ký tự; tên rỗng thì xoá tên đã đặt.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/MacAddress'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: [string, 'null'], maxLength: 32 }
+                icon: { $ref: '#/components/schemas/DeviceIcon' }
+      responses:
+        '200':
+          description: Đã lưu
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/ConnectedDevice' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+    delete:
+      operationId: removeConnectedDevice
+      tags: [P4 Thiết bị kết nối]
+      summary: Xoá thiết bị khỏi kết nối (P4-03)
+      description: |
+        Giả định chờ xác nhận (Q-53): chặn Internet theo P4-02 rồi ẩn thiết bị khỏi danh sách (TB-06). Mesh/AP và chính điện thoại đang dùng không xoá được (Q-46).
+        Đã chặn từ trước thì chỉ ẩn, trả `200` với lệnh `CONFIRMED`.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/MacAddress'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                selfMacAddress: { type: [string, 'null'] }
+                selfIpAddress: { type: [string, 'null'] }
+      responses:
+        '200': { $ref: '#/components/responses/CommandAlreadyDone' }
+        '202': { $ref: '#/components/responses/CommandAccepted' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/DeviceNotBlockableOrBusy' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+  /mesh/v1/devices/{serialNumber}/connected-devices/{macAddress}/block:
+    post:
+      operationId: blockConnectedDevice
+      tags: [P4 Thiết bị kết nối]
+      summary: Chặn Internet của thiết bị (P4-02)
+      description: |
+        Lệnh ghi theo P0-04 (TB-05). Thiết bị Mesh/AP và chính điện thoại đang dùng MiniApp không được chặn (Q-46): MiniApp gửi MAC, IP của máy lấy qua JSBridge.
+        Đã chặn rồi thì trả `200` với lệnh `CONFIRMED`, không gửi lệnh.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/MacAddress'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                selfMacAddress: { type: [string, 'null'] }
+                selfIpAddress: { type: [string, 'null'] }
+      responses:
+        '200': { $ref: '#/components/responses/CommandAlreadyDone' }
+        '202': { $ref: '#/components/responses/CommandAccepted' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/DeviceNotBlockableOrBusy' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+
+  /mesh/v1/devices/{serialNumber}/connected-devices/{macAddress}/unblock:
+    post:
+      operationId: unblockConnectedDevice
+      tags: [P4 Thiết bị kết nối]
+      summary: Mở Internet cho thiết bị (P4-02)
+      description: Lệnh ghi theo P0-04 (TB-05). Chưa chặn thì trả `200` với lệnh `CONFIRMED`, không gửi lệnh.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/MacAddress'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200': { $ref: '#/components/responses/CommandAlreadyDone' }
+        '202': { $ref: '#/components/responses/CommandAccepted' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/DeviceBusy' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+
+  # ---------------- P5 ----------------
+  /mesh/v1/devices/{serialNumber}:
+    get:
+      operationId: getDevice
+      tags: [P5 Modem]
+      summary: Thông tin modem ONT (P5-01)
+      description: |
+        7 trường (MD-01, MD-02). Gọi song song nhiều nguồn; nguồn lỗi ghi vào `errors[]` với `target` (`info`, `wan`, `optical`, `traffic`).
+        Trường chưa có nguồn trả `null`: `uptimeSec` (Q-23); `totalTrafficBytes` chưa rõ cách tính (Q-24); `temperatureCelsius` tạm lấy nhiệt độ mô-đun quang (Q-25).
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Thông tin modem
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/Device' }
+                  meta: { $ref: '#/components/schemas/ReadMeta' }
+                  errors: { $ref: '#/components/schemas/PartialErrors' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/DeviceOffline' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+        '504': { $ref: '#/components/responses/UpstreamTimeout' }
+    patch:
+      operationId: renameDevice
+      tags: [P5 Modem]
+      summary: Đổi tên gợi nhớ modem (P5-03)
+      description: Thiết bị không hỗ trợ đổi tên (Q-26), tên lưu ở MyHome theo hợp đồng, không gọi OneGate. Độ dài 1–32 ký tự (đề xuất, MD-03).
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [displayName]
+              properties:
+                displayName: { type: string, minLength: 1, maxLength: 32 }
+      responses:
+        '200':
+          description: Đã đổi tên
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/Device' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+  /mesh/v1/devices/{serialNumber}/reboot:
+    post:
+      operationId: rebootDevice
+      tags: [P5 Modem]
+      summary: Khởi động lại modem (P5-02)
+      description: |
+        Lệnh ghi theo P0-04 (MD-04). Xác nhận bằng `lastInformTime` mới hơn thời điểm gửi lệnh.
+        Giới hạn đề xuất 3 lần trong 30 phút mỗi modem; vượt thì `429 RATE_LIMITED`.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '202': { $ref: '#/components/responses/CommandAccepted' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/DeviceBusy' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/UpstreamUnavailable' }
+
+  # ---------------- P6 ----------------
+  /mesh/v1/devices/{serialNumber}/health-checks:
+    get:
+      operationId: listHealthChecks
+      tags: [P6 Chất lượng đường truyền]
+      summary: Kết quả kiểm tra gần nhất (P6-01)
+      description: Dùng `?limit=1&sort=-createdAt` để lấy lượt gần nhất (CL-03, CL-04).
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 5, default: 1 }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [-createdAt], default: -createdAt }
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Các lượt kiểm tra
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/HealthCheck' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      operationId: createHealthCheck
+      tags: [P6 Chất lượng đường truyền]
+      summary: Tự kiểm tra chất lượng đường truyền (P6-01)
+      description: |
+        MiniApp gọi mỗi lần vào tab. Quy tắc 30 phút đặt ở backend (CL-03, đề xuất): lượt gần nhất `DONE` chưa quá 30 phút và chưa hết hiệu lực (khởi động lại modem làm hết hiệu lực) thì trả lượt đó (`200`);
+        đang có lượt chạy thì trả lượt đó (`202`); ngược lại tạo lượt mới (`202`) và bộ chạy nền kiểm tra lần lượt Đường truyền Internet → Sóng Wifi → Thiết bị kết nối (CL-05).
+        Dùng chung khoá thiết bị với lệnh ghi.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Lượt gần nhất còn mới, không kiểm tra lại
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/HealthCheck' }
+        '202':
+          description: Lượt mới hoặc lượt đang chạy
+          headers:
+            Location: { $ref: '#/components/headers/Location' }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/HealthCheck' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/DeviceBusy' }
+        '422': { $ref: '#/components/responses/IdempotencyKeyReused' }
+
+  /mesh/v1/devices/{serialNumber}/health-checks/{checkId}:
+    get:
+      operationId: getHealthCheck
+      tags: [P6 Chất lượng đường truyền]
+      summary: Tiến độ và kết quả một lượt kiểm tra (P6-01)
+      description: MiniApp hỏi lại mỗi 3 giây (đề xuất) tới khi `DONE` hoặc `FAILED`. Đánh giá theo SRC-HEALTH-SCRIPT@2026-10-07 §1.
+      parameters:
+        - $ref: '#/components/parameters/SerialNumber'
+        - $ref: '#/components/parameters/CheckId'
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XClientVersion'
+      responses:
+        '200':
+          description: Lượt kiểm tra
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/HealthCheck' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token MiniApp do backend MyHome ký, MiniApp lấy qua JSBridge `getMiniAppToken` (P0-01, sso-token.md). Gateway kiểm chữ ký bằng khoá của MyHome; chủ thể là `app_user_id`.
+    scToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token người dùng do Backend SC ký (RS256), chỉ super app giữ. Chỉ dùng cho `POST /link/v1/mini-app-sessions`.
+
+  headers:
+    Location:
+      description: Đường dẫn tới tài nguyên vừa tạo hoặc lệnh vừa nhận
+      schema: { type: string }
+    RetryAfter:
+      description: Số giây nên chờ trước khi thử lại
+      schema: { type: integer }
+    XRequestId:
+      description: Mã truy vết, trùng `error.traceId`
+      schema: { type: string }
+    IdempotentReplayed:
+      description: Có khi trả lại kết quả cũ theo cùng `Idempotency-Key`
+      schema: { type: boolean, const: true }
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: '**Bắt buộc với thao tác ghi** (CF §2.3). UUIDv4 hoặc ULID, một khoá cho một lần bấm; thử lại dùng lại đúng khoá.'
+      schema: { type: string, maxLength: 64 }
+    XRequestId:
+      name: X-Request-Id
+      in: header
+      required: false
+      schema: { type: string }
+    XClientVersion:
+      name: X-Client-Version
+      in: header
+      required: false
+      description: Ví dụ `miniapp-mesh/1.0.3`
+      schema: { type: string }
+    SerialNumber:
+      name: serialNumber
+      in: path
+      required: true
+      description: Số sê-ri ONT; phải thuộc hợp đồng của người gọi
+      schema: { type: string }
+    ContractId:
+      name: contractId
+      in: path
+      required: true
+      schema: { type: string }
+    ContractIdQuery:
+      name: contractId
+      in: query
+      required: true
+      schema: { type: string }
+    LocationId:
+      name: locationId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    WifiIndex:
+      name: wifiIndex
+      in: path
+      required: true
+      description: Chỉ số mạng Wi-Fi trên modem (`index` của OneGate)
+      schema: { type: integer, minimum: 0 }
+    MacAddress:
+      name: macAddress
+      in: path
+      required: true
+      schema: { type: string, pattern: '^([0-9A-F]{2}:){5}[0-9A-F]{2}$' }
+    CommandId:
+      name: commandId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    CheckId:
+      name: checkId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    CommandAccepted:
+      description: Đã nhận lệnh ghi xuống modem (P0-04). `state` có thể là `SENT`, `UNKNOWN` hoặc `FAILED`; `UNKNOWN` không phải lỗi.
+      headers:
+        Location: { $ref: '#/components/headers/Location' }
+        Idempotent-Replayed: { $ref: '#/components/headers/IdempotentReplayed' }
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data: { $ref: '#/components/schemas/Command' }
+    CommandAlreadyDone:
+      description: Thiết bị đã ở trạng thái mong muốn, không gửi lệnh; lệnh `CONFIRMED`
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data: { $ref: '#/components/schemas/Command' }
+    ValidationFailed:
+      description: '`VALIDATION_FAILED` hoặc `BAD_REQUEST`; chi tiết ở `details[]`'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    IdempotencyKeyRequired:
+      description: '`IDEMPOTENCY_KEY_REQUIRED`'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    Unauthenticated:
+      description: '`UNAUTHENTICATED` hoặc `TOKEN_EXPIRED`. MiniApp xin token mới qua JSBridge rồi gọi lại đúng 1 lần.'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    NotFound:
+      description: '`NOT_FOUND`: không có hoặc không thuộc người gọi (không phân biệt)'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    Conflict:
+      description: '`CONFLICT`: trạng thái hiện tại không cho phép'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    RequestInProgress:
+      description: '`REQUEST_IN_PROGRESS`: cùng `Idempotency-Key` đang xử lý'
+      headers:
+        Retry-After: { $ref: '#/components/headers/RetryAfter' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    IdempotencyKeyReused:
+      description: '`IDEMPOTENCY_KEY_REUSED`: cùng khoá, khác nội dung'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    LocationLimitReached:
+      description: '`LOCATION_LIMIT_REACHED`: đã đủ 20 vị trí (VT-01); hoặc `REQUEST_IN_PROGRESS`'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    DeviceBusy:
+      description: '`DEVICE_BUSY`: modem đang có lệnh ghi hoặc lượt kiểm tra khác; hoặc `REQUEST_IN_PROGRESS`'
+      headers:
+        Retry-After: { $ref: '#/components/headers/RetryAfter' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    DeviceNotBlockableOrBusy:
+      description: '`DEVICE_NOT_BLOCKABLE` (Mesh/AP, chính điện thoại, hoặc chưa xác định được loại; Q-46), `DEVICE_BUSY` hoặc `REQUEST_IN_PROGRESS`'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    DeviceOffline:
+      description: '`DEVICE_OFFLINE`: OneGate báo modem không trả lời (lỗi loại `BUSINESS` theo `integration-layer.md` §3)'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    RateLimited:
+      description: '`RATE_LIMITED`'
+      headers:
+        Retry-After: { $ref: '#/components/headers/RetryAfter' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    UpstreamUnavailable:
+      description: '`UPSTREAM_UNAVAILABLE`: hệ thống ngoài lỗi hoặc đang ngừng gọi, không có dữ liệu cũ. Với lệnh ghi: lệnh chưa được gửi.'
+      headers:
+        Retry-After: { $ref: '#/components/headers/RetryAfter' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    UpstreamTimeout:
+      description: '`UPSTREAM_TIMEOUT`: hết thời gian chờ ở luồng đọc, không có dữ liệu cũ'
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  schemas:
+    # ----- Khung chung (CF §2, §3) -----
+    ReadMeta:
+      type: object
+      properties:
+        source: { type: string, enum: [LIVE, CACHE] }
+        updatedAt: { type: [string, 'null'], format: date-time }
+        stale: { type: boolean, description: true khi trả dữ liệu cũ vì hệ thống ngoài lỗi }
+    PartialErrors:
+      type: array
+      description: Lỗi từng phần, phản hồi vẫn `200` (CF §2.2)
+      items:
+        type: object
+        required: [code, target]
+        properties:
+          code: { $ref: '#/components/schemas/ErrorCode' }
+          target: { type: string }
+    ErrorCode:
+      type: string
+      description: Mã chung CF §3.2 và mã riêng của MiniApp. FE gặp mã lạ thì xử lý theo HTTP status và `retryable`.
+      enum:
+        - BAD_REQUEST
+        - VALIDATION_FAILED
+        - IDEMPOTENCY_KEY_REQUIRED
+        - UNAUTHENTICATED
+        - TOKEN_EXPIRED
+        - FORBIDDEN
+        - NOT_FOUND
+        - CONFLICT
+        - REQUEST_IN_PROGRESS
+        - IDEMPOTENCY_KEY_REUSED
+        - PAYLOAD_TOO_LARGE
+        - RATE_LIMITED
+        - INTERNAL
+        - SERVICE_UNAVAILABLE
+        - UPSTREAM_UNAVAILABLE
+        - UPSTREAM_TIMEOUT
+        - UPSTREAM_REJECTED
+        - LOCATION_LIMIT_REACHED
+        - DEVICE_NOT_BLOCKABLE
+        - DEVICE_BUSY
+        - DEVICE_OFFLINE
+        - VERIFY_MISMATCH
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, traceId, retryable]
+          properties:
+            code: { $ref: '#/components/schemas/ErrorCode' }
+            message: { type: string, description: 'Cho lập trình viên, tiếng Anh, không hiển thị cho người dùng' }
+            traceId: { type: string }
+            retryable: { type: boolean }
+            retryAfterSec: { type: integer }
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field: { type: string }
+                  code: { type: string, examples: [TOO_LONG, DUPLICATE] }
+                  message: { type: string }
+
+    # ----- P0 -----
+    CommandState:
+      type: string
+      enum: [PENDING, SENT, UNKNOWN, CONFIRMED, FAILED]
+    Command:
+      type: object
+      required: [commandId, state]
+      properties:
+        commandId: { type: string, format: uuid }
+        type:
+          type: string
+          enum: [WIFI_UPDATE, CLIENT_BLOCK, CLIENT_UNBLOCK, REBOOT]
+        state: { $ref: '#/components/schemas/CommandState' }
+        retryAfterSec: { type: [integer, 'null'] }
+        errorCode:
+          description: Chỉ có khi `state` = `FAILED` (P0-04)
+          oneOf:
+            - $ref: '#/components/schemas/ErrorCode'
+            - type: 'null'
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    # ----- P1 -----
+    ContractLink:
+      type: object
+      required: [contractId, contractCode, selected]
+      properties:
+        contractId: { type: string, description: Mã MyHome của liên kết hợp đồng }
+        contractCode: { type: string, description: Mã hợp đồng (`ma_hd`) }
+        address: { type: [string, 'null'] }
+        maskedPhone: { type: string, examples: ['09xx***678'] }
+        selected: { type: boolean }
+    ContractLinkDetail:
+      allOf:
+        - $ref: '#/components/schemas/ContractLink'
+        - type: object
+          properties:
+            lastPaymentDate: { type: [string, 'null'], format: date, description: 'Lần thanh toán gần nhất: `paymentDate` mới nhất của `myvnpt_tracuu_thongtin_thanhtoan` (SRC-BRCD §II.7.9); lỗi thì `null` kèm `errors[]` `target` = `payment`' }
+            registrationDate: { type: [string, 'null'], format: date, description: 'Ngày đăng ký = `ngaylap_hd` của OneBSS (đề xuất, Q-47)' }
+            expiryDate: { type: [string, 'null'], format: date, description: 'Ngày hết hạn = `ngay_kt` của gói cước, `null` với thuê bao trả sau (đề xuất, Q-47). Nút "Thanh toán / Gia hạn ngay" chỉ điều hướng sang super app, không có API' }
+            serialNumber: { type: [string, 'null'], description: Số sê-ri ONT do OneBSS trả cùng hợp đồng (P1-01); null khi OneBSS không trả }
+            modelName: { type: [string, 'null'], description: Dòng máy ONT do OneBSS trả cùng hợp đồng }
+            planDownloadMbps: { type: [number, 'null'], description: 'Tốc độ gói (QD-02, Q-48)' }
+
+    # ----- P2 -----
+    SignalLevel:
+      type: string
+      enum: [GOOD, FAIR, WEAK]
+    SignalThresholds:
+      type: object
+      required: [android, ios]
+      properties:
+        android:
+          type: object
+          description: Theo tỉ lệ tốc độ đo trên tốc độ gói (QD-02) và độ trễ tới modem (QD-03)
+          properties:
+            goodMinPercent: { type: number, description: 'Từ mức này trở lên là GOOD' }
+            fairMinPercent: { type: number, description: 'Từ mức này tới dưới goodMinPercent là FAIR; dưới là WEAK' }
+            latencyDowngradeMs: { type: number, description: 'Độ trễ vượt mức này thì hạ một mức (0,05 giây)' }
+        ios:
+          type: object
+          description: Theo RSSI nhập từ AirPort Utility (QD-04)
+          properties:
+            goodAboveDbm: { type: integer, examples: [-60] }
+            fairAboveDbm: { type: integer, examples: [-70] }
+    MeasurementLocation:
+      type: object
+      required: [locationId, name]
+      properties:
+        locationId: { type: string, format: uuid }
+        name: { type: string, maxLength: 30 }
+        latestLevel:
+          oneOf:
+            - $ref: '#/components/schemas/SignalLevel'
+            - type: 'null'
+        latestMeasuredAt: { type: [string, 'null'], format: date-time }
+        createdAt: { type: string, format: date-time }
+    MeasurementInput:
+      type: object
+      required: [platform, measuredAt]
+      properties:
+        platform: { type: string, enum: [ANDROID, IOS] }
+        measuredAt: { type: string, format: date-time }
+        downloadMbps: { type: number, minimum: 0, description: Bắt buộc với `ANDROID` }
+        latencyMs: { type: number, minimum: 0, description: 'Độ trễ tới modem, bắt buộc với `ANDROID`' }
+        rssiDbm: { type: integer, minimum: -100, maximum: -30, description: Bắt buộc với `IOS` }
+    Measurement:
+      type: object
+      required: [measurementId, level, measuredAt]
+      properties:
+        measurementId: { type: string, format: uuid }
+        level: { $ref: '#/components/schemas/SignalLevel' }
+        measuredAt: { type: string, format: date-time }
+
+    # ----- P3 -----
+    WifiNetwork:
+      type: object
+      required: [wifiIndex, ssid, band, enabled]
+      properties:
+        wifiIndex: { type: integer }
+        ssid: { type: string, maxLength: 32 }
+        band: { type: string, enum: [BAND_2_4GHZ, BAND_5GHZ] }
+        enabled: { type: boolean }
+        securityMode: { type: [string, 'null'], description: 'Kiểu bảo mật (ví dụ WPA2-PSK), từ `authMode` của ONT hoặc `securityMode` của Mesh; dùng tạo chuỗi mã QR' }
+    WifiPassword:
+      type: object
+      required: [wifiIndex, ssid, password]
+      properties:
+        wifiIndex: { type: integer }
+        ssid: { type: string }
+        password: { type: string }
+        securityMode: { type: [string, 'null'], description: Dùng khi tạo chuỗi mã QR (WF-07) }
+    # ----- P4 -----
+    ConnectedDeviceStatus:
+      type: string
+      description: '`BLOCKED` ưu tiên nhất; `CONNECTED` khi `isActive`; còn lại `DISCONNECTED` (P4-01)'
+      enum: [CONNECTED, DISCONNECTED, BLOCKED]
+    DeviceIcon:
+      type: string
+      description: 8 icon theo mockup (TB-07); mã đề xuất, chốt cùng thiết kế
+      enum: [PHONE, TABLET, LAPTOP, TV, ROUTER, STORAGE, MESH, CAMERA]
+    ConnectedDevice:
+      type: object
+      required: [macAddress, name, kind, status, blockable]
+      properties:
+        macAddress: { type: string }
+        name: { type: string }
+        icon: { $ref: '#/components/schemas/DeviceIcon' }
+        kind: { type: string, enum: [MESH, AP, CLIENT] }
+        status: { $ref: '#/components/schemas/ConnectedDeviceStatus' }
+        connectionType:
+          type: [string, 'null']
+          enum: [WIRED, WIRELESS, null]
+        ipAddress: { type: [string, 'null'] }
+        wifiSsid: { type: [string, 'null'], description: 'Tên Wi-Fi thiết bị đang kết nối; OneGate chưa trả nên luôn `null` (G-09). Dòng "Kết nối qua" hiện "Wi-Fi" hoặc "Có dây" theo `connectionType`' }
+        blockable: { type: boolean, description: false với Mesh/AP hoặc khi chưa xác định được loại }
+        trafficSharePercent: { type: [integer, 'null'], minimum: 0, maximum: 100, description: 'Phần trăm lưu lượng tải xuống của thiết bị; `null` tới khi OneGate có lưu lượng từng thiết bị (G-14)' }
+
+    # ----- P5 -----
+    Device:
+      type: object
+      required: [serialNumber, displayName]
+      description: 7 trường thông tin ONT (MD-02); trường thiếu nguồn trả `null`
+      properties:
+        serialNumber: { type: string }
+        modelName: { type: [string, 'null'] }
+        displayName: { type: string, description: 'Tên gợi nhớ, không có thì tên dòng máy' }
+        macAddress: { type: [string, 'null'] }
+        wanIpAddress: { type: [string, 'null'] }
+        firmwareVersion: { type: [string, 'null'] }
+        uptimeSec: { type: [integer, 'null'], description: Chưa có nguồn (Q-23) }
+        totalTrafficBytes: { type: [integer, 'null'], description: Chưa rõ cách tính (Q-24) }
+        temperatureCelsius: { type: [number, 'null'], description: Nhiệt độ mô-đun quang (Q-25) }
+
+    # ----- P6 -----
+    HealthCheckState:
+      type: string
+      enum: [PENDING, RUNNING, DONE, FAILED]
+    HealthCheckItem:
+      type: object
+      required: [itemType, state]
+      description: Một hạng mục kiểm tra (SRC-HEALTH-SCRIPT@2026-10-07 §1). MiniApp ghép câu chữ từ `status` và số liệu.
+      properties:
+        itemType: { type: string, enum: [INTERNET_LINE, WIFI_SIGNAL, CONNECTED_DEVICES] }
+        state: { $ref: '#/components/schemas/HealthCheckState' }
+        status:
+          type: [string, 'null']
+          description: 'INTERNET_LINE: STABLE, UNSTABLE, DISCONNECTED. WIFI_SIGNAL: PASS, FAIL, OFF. CONNECTED_DEVICES: NORMAL, HOGGED. `null` khi chưa xong hoặc FAILED'
+          enum: [STABLE, UNSTABLE, DISCONNECTED, PASS, FAIL, OFF, NORMAL, HOGGED, null]
+        action:
+          type: [string, 'null']
+          description: Nút hành động kèm hạng mục
+          enum: [RESET_MODEM, REPORT_FAULT, ENABLE_WIFI, ORDER_MESH, OPEN_DEVICES_TAB, null]
+        dropCount: { type: [integer, 'null'], description: 'Số lần mất kết nối trong 24 giờ, chỉ với `INTERNET_LINE` (Q-55)' }
+        activeDeviceCount: { type: [integer, 'null'], description: '`totalActiveDevice`, chỉ với `CONNECTED_DEVICES` (BR-72)' }
+        topDevice:
+          type: [object, 'null']
+          description: Thiết bị chiếm nhiều lưu lượng nhất khi `status` = `HOGGED`
+          properties:
+            macAddress: { type: string }
+            name: { type: [string, 'null'] }
+            sharePercent: { type: integer, minimum: 0, maximum: 100 }
+        errorCode:
+          oneOf:
+            - $ref: '#/components/schemas/ErrorCode'
+            - type: 'null'
+    HealthCheck:
+      type: object
+      required: [checkId, state, items]
+      properties:
+        checkId: { type: string, format: uuid }
+        state: { $ref: '#/components/schemas/HealthCheckState' }
+        overallStatus:
+          type: [string, 'null']
+          description: '`INCOMPLETE` khi có hạng mục không kiểm tra được (BR-70)'
+          enum: [NO_ISSUE, ISSUES_FOUND, INCOMPLETE, null]
+        issueCount: { type: [integer, 'null'] }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/HealthCheckItem' }
+        createdAt: { type: string, format: date-time }
+        finishedAt: { type: [string, 'null'], format: date-time }

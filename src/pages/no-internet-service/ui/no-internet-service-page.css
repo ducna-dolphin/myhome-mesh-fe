@@ -1,0 +1,112 @@
+/* Full-screen state without the Internet header (XD Mesh - Wifi - 1). */
+.no-service {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top) 0 calc(var(--space-6) + env(safe-area-inset-bottom));
+  background: var(--color-surface);
+  text-align: center;
+}
+.no-service__close {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + var(--space-3));
+  right: var(--space-4);
+  z-index: var(--z-raised);
+}
+.no-service__track {
+  flex: 1;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.no-service__track::-webkit-scrollbar {
+  display: none;
+}
+.no-service__slide {
+  flex: 0 0 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-6) var(--space-4);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+.no-service-hero {
+  width: min(100%, 300px);
+  height: auto;
+  margin-bottom: var(--space-6);
+}
+.no-service-hero__glow {
+  fill: var(--color-brand-soft);
+}
+.no-service-hero__arc {
+  fill: none;
+  stroke: var(--color-brand);
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+.no-service-hero__modem,
+.no-service-hero__phone {
+  fill: var(--color-surface);
+  stroke: var(--color-border);
+  stroke-width: 2;
+}
+.no-service-hero__screen {
+  fill: var(--color-input);
+}
+.no-service-hero__led {
+  fill: var(--color-brand);
+}
+.no-service__title {
+  max-width: 320px;
+  margin: 0;
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+.no-service__subtitle {
+  max-width: 300px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+}
+.no-service__dots {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-4) 0 var(--space-6);
+}
+.no-service__dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-track);
+  cursor: pointer;
+  transition: width var(--duration-base) var(--ease-standard);
+}
+/* 8px dot, 24px hit area (dots sit in a row, 44px would overlap). */
+.no-service__dot::before {
+  content: '';
+  position: absolute;
+  inset: -8px -4px;
+}
+.no-service__dot.is-active {
+  width: 20px;
+  background: var(--color-brand);
+}
+.no-service__footer {
+  position: relative;
+  padding: 0 var(--space-4);
+}

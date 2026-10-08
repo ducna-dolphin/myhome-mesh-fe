@@ -1,0 +1,40 @@
+{
+  "title": "Internet",
+  "close": "Đóng Internet",
+  "tabs": {
+    "label": "Chức năng Internet",
+    "wifi": "Wifi",
+    "devices": "Thiết bị kết nối",
+    "modem": "Modem",
+    "quality": "Chất lượng"
+  },
+  "contract": {
+    "title": "Thông tin hợp đồng",
+    "code": "Mã hợp đồng",
+    "registrationDate": "Ngày đăng ký",
+    "expiryDate": "Ngày hết hạn",
+    "lastPaymentDate": "Lần thanh toán gần nhất",
+    "pay": "Thanh toán / Gia hạn ngay",
+    "select": "Chọn hợp đồng",
+    "selectPlaceholder": "Chọn hợp đồng để tiếp tục",
+    "selectHint": "Bạn có nhiều hợp đồng Internet. Chọn một hợp đồng để xem và quản lý mạng.",
+    "option": "{{code}} – {{address}}",
+    "selectFailed": "Không đổi được hợp đồng. Vui lòng thử lại.",
+    "paymentFailed": "Không mở được trang thanh toán. Vui lòng thử lại."
+  },
+  "loading": "Đang tải thông tin hợp đồng",
+  "noModem": "Chưa xác định được modem của hợp đồng",
+  "noService": {
+    "carouselLabel": "Giới thiệu dịch vụ Internet",
+    "slideLabel": "Trang {{index}} / {{total}}",
+    "goToSlide": "Chuyển tới trang {{index}}",
+    "slide1": {
+      "title": "Quản lý mạng gia đình trong tầm tay",
+      "subtitle": "Đổi tên, mật khẩu, bật/tắt và chia sẻ Wi-fi chỉ với vài chạm"
+    },
+    "cta": "Đăng ký ngay",
+    "openFailed": "Không mở được VNPT Shop. Vui lòng thử lại.",
+    "unsupported": "Phiên bản ứng dụng chưa hỗ trợ mở VNPT Shop."
+  },
+  "staleAt": "Cập nhật lúc {{time}}"
+}

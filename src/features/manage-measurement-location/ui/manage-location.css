@@ -1,0 +1,41 @@
+.location-name-form {
+  display: grid;
+  gap: var(--space-4);
+}
+.location-name-form__suggestions {
+  display: grid;
+  gap: var(--space-2);
+}
+.location-name-form__caps {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+}
+.location-name-form__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.location-name-form__hint {
+  margin: calc(-1 * var(--space-2)) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+.location-name-form__error {
+  margin: 0;
+  color: var(--color-danger-fg);
+  font-size: var(--font-size-body);
+}
+.location-name-form__actions {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-divider);
+}
+.rename-location-form {
+  margin-top: var(--space-3);
+  text-align: left;
+}

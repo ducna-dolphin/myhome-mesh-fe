@@ -1,0 +1,74 @@
+/*
+ * Pending-spec marker. The tooltip is positioned against the nearest positioned ancestor
+ * (rows opt in with `position: relative`) and stretches to its width, so it cannot overflow
+ * the viewport. Closed tooltips use `hidden`, taking no layout space.
+ */
+.spec-note {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-inline: 4px;
+}
+.spec-note__trigger {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px dashed var(--warning);
+  border-radius: 50%;
+  background: var(--warning-bg);
+  color: var(--warning);
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  cursor: help;
+}
+/* 18px visual, 44px touch target. */
+.spec-note__trigger::before {
+  content: '';
+  position: absolute;
+  inset: -13px;
+}
+.spec-note .spec-note__tooltip {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: var(--z-raised);
+  padding: 10px 12px;
+  display: grid;
+  gap: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--color-tooltip);
+  color: var(--color-on-brand);
+  box-shadow: var(--shadow-popover);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  animation: spec-note-in 150ms ease both;
+}
+.spec-note .spec-note__tooltip[hidden] {
+  display: none;
+}
+.spec-note .spec-note__tooltip strong {
+  color: var(--color-tooltip-accent);
+  font-size: 11px;
+  text-align: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+@keyframes spec-note-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spec-note .spec-note__tooltip {
+    animation: none;
+  }
+}

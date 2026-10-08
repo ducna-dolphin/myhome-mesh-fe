@@ -1,0 +1,105 @@
+.ui-sheet {
+  align-items: flex-end;
+  justify-content: center;
+  /* Lift the sheet above the on-screen keyboard (iOS does not resize the layout viewport). */
+  padding-bottom: var(--keyboard-inset, 0px);
+}
+.ui-sheet__panel {
+  --sheet-drag: 0px;
+  width: min(100%, 430px);
+  max-height: calc(100dvh - var(--space-8) - env(safe-area-inset-top) - var(--keyboard-inset, 0px));
+  display: flex;
+  flex-direction: column;
+  overscroll-behavior: contain;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sheet);
+  transform: translateY(var(--sheet-drag));
+  animation: ui-sheet-in var(--duration-slow) var(--ease-out-quint);
+  transition: transform var(--duration-base) var(--ease-out-quint);
+}
+/* Follow the finger 1:1 while dragging. */
+.ui-sheet__panel[data-dragging] {
+  transition: none;
+}
+.ui-sheet[data-state='closing'] .ui-sheet__panel {
+  pointer-events: none;
+  animation: ui-sheet-out var(--duration-exit-slow) var(--ease-exit) forwards;
+}
+.ui-sheet__handle.is-draggable {
+  cursor: grab;
+  /* Vertical drags on the handle belong to the sheet, not to page scroll. */
+  touch-action: none;
+}
+.ui-sheet__panel[data-dragging] .ui-sheet__handle {
+  cursor: grabbing;
+}
+.ui-sheet__grabber {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 4px;
+  margin: var(--space-2) auto 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-track);
+}
+/* Without a header the grabber row alone is the drag target: give it a usable height. */
+.ui-sheet__handle > .ui-sheet__grabber:only-child {
+  margin-bottom: var(--space-3);
+}
+.ui-sheet__header {
+  flex: 0 0 auto;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-1) var(--space-5);
+}
+.ui-sheet__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  overflow-wrap: anywhere;
+}
+.ui-sheet__close {
+  margin-left: auto;
+}
+.ui-sheet__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-2) var(--space-5) var(--space-4);
+}
+/* Without a footer, the body owns the safe-area padding. */
+.ui-sheet__body:last-child {
+  padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
+}
+.ui-sheet__footer {
+  flex: 0 0 auto;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5) calc(var(--space-4) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-divider);
+}
+
+@keyframes ui-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes ui-sheet-out {
+  from {
+    transform: translateY(var(--sheet-drag));
+  }
+  to {
+    transform: translateY(100%);
+  }
+}

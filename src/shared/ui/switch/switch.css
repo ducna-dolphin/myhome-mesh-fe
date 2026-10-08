@@ -1,0 +1,73 @@
+.ui-switch {
+  --switch-width: 51px;
+  --switch-height: 31px;
+  --switch-inset: 2px;
+  position: relative;
+  flex: 0 0 var(--switch-width);
+  width: var(--switch-width);
+  height: var(--switch-height);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-track);
+  cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
+}
+/* 31px visual, 44px touch target. */
+.ui-switch::before {
+  content: '';
+  position: absolute;
+  inset: -7px -4px;
+}
+.ui-switch.is-checked {
+  background: var(--color-brand);
+}
+.ui-switch__thumb {
+  position: absolute;
+  top: var(--switch-inset);
+  left: var(--switch-inset);
+  width: calc(var(--switch-height) - 2 * var(--switch-inset));
+  height: calc(var(--switch-height) - 2 * var(--switch-inset));
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-popover);
+  /* The one place a tiny overshoot is allowed (native switch feel). */
+  transition: transform var(--duration-base) var(--ease-overshoot);
+}
+/* Pressed: the thumb stretches toward the side it will travel to (iOS). */
+.ui-switch:active:not(:disabled, .is-pending) .ui-switch__thumb {
+  width: calc(var(--switch-height) - 2 * var(--switch-inset) + 6px);
+  transition:
+    transform var(--duration-base) var(--ease-overshoot),
+    width var(--duration-fast) var(--ease-out-quart);
+}
+.ui-switch.is-checked:active:not(:disabled, .is-pending) .ui-switch__thumb {
+  transform: translateX(calc(var(--switch-width) - var(--switch-height) - 6px));
+}
+.ui-switch.is-checked .ui-switch__thumb {
+  transform: translateX(calc(var(--switch-width) - var(--switch-height)));
+}
+/* Pending: a ring spins inside the thumb. */
+.ui-switch.is-pending {
+  cursor: progress;
+}
+.ui-switch.is-pending .ui-switch__thumb::after {
+  content: '';
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--color-brand);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ui-spin 700ms linear infinite;
+}
+.ui-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-switch.is-pending .ui-switch__thumb::after {
+    animation: none;
+  }
+}

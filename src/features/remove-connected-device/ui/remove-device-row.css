@@ -1,0 +1,12 @@
+.remove-device {
+  padding-block: var(--space-1);
+}
+.remove-device__note {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-normal);
+}
+.remove-device__note--waiting {
+  color: var(--color-warning-fg);
+}

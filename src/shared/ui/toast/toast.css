@@ -1,0 +1,66 @@
+.ui-toast-region {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom) + var(--keyboard-inset, 0px));
+  z-index: var(--z-toast);
+  width: min(100%, 430px);
+  padding: 0 var(--space-4);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+/* Popover reset: the region is a manual popover only to join the top layer above modals. */
+.ui-toast-region[popover] {
+  inset: auto auto calc(var(--space-4) + env(safe-area-inset-bottom) + var(--keyboard-inset, 0px)) 50%;
+  height: auto;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+}
+/* Browsers without the Popover API ignore the attribute; keep the region in the layout then. */
+.ui-toast-region[popover]:not(:popover-open) {
+  display: block;
+}
+.ui-toast {
+  min-height: var(--size-control);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-popover);
+  color: var(--color-on-brand);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  animation: ui-toast-in var(--duration-base) var(--ease-out-quint);
+}
+.ui-toast[data-state='closing'] {
+  animation: ui-toast-out var(--duration-exit) var(--ease-exit) forwards;
+}
+.ui-toast__icon {
+  flex: 0 0 auto;
+}
+.ui-toast__message {
+  min-width: 0;
+}
+.ui-toast--brand {
+  background: var(--color-brand);
+}
+.ui-toast--danger {
+  background: var(--color-danger-fg);
+}
+
+@keyframes ui-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+@keyframes ui-toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

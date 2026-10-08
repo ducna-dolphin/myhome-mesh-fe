@@ -1,0 +1,110 @@
+.ui-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-instant) var(--ease-standard);
+}
+.ui-button:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+/* Loading: the label keeps its width; the spinner sits on top of it. */
+.ui-button__spinner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.ui-button.is-loading > :not(.ui-button__spinner) {
+  opacity: 0;
+}
+.ui-button--md {
+  min-height: var(--size-control);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-subheading);
+}
+.ui-button--sm {
+  min-height: var(--size-control-sm);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-body);
+}
+/* 32px visual, ≥44px touch target. */
+.ui-button--sm::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
+}
+.ui-button--full {
+  width: 100%;
+}
+
+.ui-button--primary {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+.ui-button--primary:active:not(:disabled) {
+  background: var(--color-brand-pressed);
+}
+
+.ui-button--secondary {
+  background: var(--color-surface);
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+.ui-button--secondary:active:not(:disabled) {
+  background: var(--color-brand-soft);
+}
+
+.ui-button--ghost {
+  background: transparent;
+  color: var(--color-brand);
+}
+.ui-button--ghost:active:not(:disabled) {
+  background: var(--color-brand-soft);
+}
+
+.ui-button--danger {
+  background: var(--color-danger-fg);
+  color: var(--color-on-brand);
+}
+.ui-button--danger:active:not(:disabled) {
+  filter: brightness(0.9);
+}
+
+/* XD disabled: solid grey fill, white label. */
+.ui-button:disabled:not(.is-loading) {
+  cursor: not-allowed;
+}
+.ui-button--primary:disabled:not(.is-loading),
+.ui-button--danger:disabled:not(.is-loading) {
+  background: var(--color-text-disabled);
+  color: var(--color-on-brand);
+}
+.ui-button--secondary:disabled:not(.is-loading),
+.ui-button--ghost:disabled:not(.is-loading) {
+  border-color: var(--color-track);
+  color: var(--color-text-disabled);
+}
+.ui-button.is-loading {
+  cursor: progress;
+}
+
+@media (hover: hover) {
+  .ui-button--secondary:hover:not(:disabled),
+  .ui-button--ghost:hover:not(:disabled) {
+    background: var(--color-brand-soft);
+  }
+}

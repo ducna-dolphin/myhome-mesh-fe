@@ -1,0 +1,9 @@
+dist
+dist-size
+coverage
+node_modules
+plans/**/.~lock.*
+contracts/openapi.yaml
+src/shared/api/generated/
+public/mockServiceWorker.js
+.claude/

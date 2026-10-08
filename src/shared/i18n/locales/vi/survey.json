@@ -1,0 +1,173 @@
+{
+  "title": "Sức khoẻ Wi-fi theo khu vực",
+  "counter": "{{used}}/{{max}} vị trí",
+  "level": {
+    "GOOD": "Khoẻ",
+    "FAIR": "Trung bình",
+    "WEAK": "Yếu",
+    "NONE": "Chưa đo"
+  },
+  "empty": {
+    "title": "Tự kiểm tra sóng từng vị trí",
+    "subtitle": "Tên vị trí do bạn tự đặt",
+    "conditionsTitle": "Cần có đủ 4 điều kiện",
+    "conditions": {
+      "home": "Bạn đang ở nhà",
+      "wifi": "Máy kết nối đúng vào Wi-fi nhà bạn",
+      "vpn": "Đã tắt VPN",
+      "position": "Đang đứng ở vị trí cần đo"
+    },
+    "start": "Tự đo"
+  },
+  "grid": {
+    "label": "Vị trí đo sóng",
+    "add": "Thêm vị trí",
+    "limitReached": "Đã đủ {{max}} vị trí. Xoá bớt vị trí để thêm vị trí mới.",
+    "measuredOn": "Đo ngày {{date}}",
+    "measureNow": "Đo ngay",
+    "measureNowLabel": "Đo ngay {{name}}",
+    "menuLabel": "Tuỳ chọn {{name}}",
+    "loading": "Đang tải vị trí đo",
+    "error": "Không tải được vị trí đo sóng."
+  },
+  "weakAlert": "<b>{{name}}</b> đang có sóng yếu. Lắp thêm <b>1 bộ Mesh</b> để phủ sóng tốt hơn",
+  "mesh": {
+    "title": "Đặt lắp thêm Mesh",
+    "subtitle": "Chỉ thêm 30k/tháng để tăng tốc độ Wi-fi"
+  },
+  "menu": {
+    "rename": "Đổi tên vị trí",
+    "remeasure": "Đo lại và xem lịch sử",
+    "delete": "Xoá vị trí",
+    "close": "Đóng"
+  },
+  "name": {
+    "sheetTitle": "Tự đo",
+    "label": "Đặt tên vị trí đo",
+    "placeholder": "Ví dụ: Phòng ngủ tầng 2",
+    "suggestionsTitle": "Gợi ý tên",
+    "suggestions": {
+      "livingRoom": "Phòng khách",
+      "bedroom": "Phòng ngủ tầng 1",
+      "kitchen": "Bếp",
+      "office": "Phòng làm việc",
+      "balcony": "Ban công"
+    },
+    "hint": "Gõ tên bất kỳ hoặc chọn nhanh ở trên. Tối đa {{maxLength}} ký tự, {{max}} vị trí",
+    "saveAndMeasure": "Lưu & đo ngay",
+    "saveLater": "Lưu, đo sau",
+    "close": "Đóng",
+    "savedToast": "Đã lưu {{name}}. Bạn có thể đo bất cứ lúc nào",
+    "errors": {
+      "required": "Vui lòng nhập tên vị trí.",
+      "tooLong": "Tên vị trí tối đa {{max}} ký tự.",
+      "duplicate": "Tên này đã có. Vui lòng đặt tên khác.",
+      "invalidCharacters": "Tên chỉ gồm chữ, số, khoảng trắng và các dấu - _ . , ( ) / '",
+      "limitReached": "Đã đủ {{max}} vị trí. Xoá bớt vị trí để thêm vị trí mới.",
+      "notFound": "Vị trí này không còn tồn tại."
+    }
+  },
+  "rename": {
+    "title": "Đổi tên vị trí",
+    "label": "Tên vị trí",
+    "save": "Lưu",
+    "cancel": "Huỷ",
+    "toast": "Đã đổi tên thành {{name}}"
+  },
+  "delete": {
+    "title": "Xoá vị trí?",
+    "description": "Xoá vị trí <b>{{name}}</b>. Toàn bộ lịch sử đo của vị trí này cũng sẽ bị xoá và không thể khôi phục",
+    "confirm": "Xoá vị trí",
+    "cancel": "Huỷ",
+    "toast": "Đã xoá {{name}}",
+    "failed": "Chưa xoá được {{name}}. {{reason}}"
+  },
+  "confirm": {
+    "title": "Bạn đang ở {{name}}?",
+    "description": "Hãy đứng đúng vị trí này trước khi đo, để có kết quả được chính xác",
+    "confirm": "Đúng rồi, đo tiếp",
+    "cancel": "Đổi vị trí khác"
+  },
+  "measure": {
+    "close": "Đóng",
+    "rename": "Đổi tên {{name}}",
+    "delete": "Xoá {{name}}",
+    "preparing": "Đang chuẩn bị đo...",
+    "checking": "Đang kiểm tra điều kiện đo...",
+    "running": "Đang đo sóng Wi-fi...",
+    "hint": "Đứng giữa phòng, giữ máy trong khoảng {{seconds}} giây",
+    "progress": "Tiến độ đo",
+    "saving": "Đang lưu kết quả...",
+    "quality": "Chất lượng Wi-fi: {{level}}",
+    "notMeasured": "Vị trí này chưa được đo",
+    "start": "Đo ngay",
+    "remeasure": "Đo lại",
+    "retry": "Thử lại",
+    "savedToast": "Đã lưu kết quả {{name}}: {{level}}",
+    "trialNote": "Kết quả đo thử trên Wi-fi khác, không được lưu.",
+    "latencyOnlyNote": "Chưa có tốc độ gói cước nên mức sóng tạm tính theo độ trễ.",
+    "unsynced": "Chưa đồng bộ",
+    "unsyncedHint": "Mất kết nối khi lưu. Kết quả sẽ được gửi lại khi có mạng.",
+    "resend": "Gửi lại",
+    "cancelled": {
+      "title": "Đã huỷ lượt đo",
+      "NETWORK_CHANGED": "Kết nối mạng thay đổi trong lúc đo nên kết quả không được lưu. Hãy giữ kết nối Wi-fi nhà bạn rồi đo lại.",
+      "BACKGROUND": "Ứng dụng chạy nền quá lâu trong lúc đo nên kết quả không được lưu. Hãy đo lại."
+    },
+    "failed": {
+      "title": "Chưa đo được",
+      "planUnknown": "Chưa xác định được tốc độ gói cước của hợp đồng nên chưa lưu được kết quả đo."
+    },
+    "conditions": {
+      "title": "Chưa đủ điều kiện đo",
+      "NOT_WIFI": "Điện thoại đang dùng 4G hoặc chưa kết nối mạng. Hãy kết nối Wi-fi nhà bạn rồi thử lại.",
+      "VPN_ACTIVE": "Điện thoại đang bật VPN. Hãy tắt VPN rồi thử lại.",
+      "WRONG_MODEM": "Điện thoại đang kết nối Wi-fi không thuộc modem của hợp đồng này. Hãy kết nối đúng Wi-fi nhà bạn rồi thử lại.",
+      "trial": "Đo thử, không lưu"
+    }
+  },
+  "history": {
+    "title": "Lịch sử đo",
+    "subtitle": "(5 lần gần nhất)",
+    "new": "Mới"
+  },
+  "manual": {
+    "needApp": {
+      "title": "Cần ứng dụng AirPort Utility",
+      "subtitle": "Trên iPhone cần ứng dụng miễn phí của Apple để đo sóng Wi-fi",
+      "download": "Tải trên App Store",
+      "haveApp": "Tôi đã có ứng dụng"
+    },
+    "returned": {
+      "title": "Đo bằng AirPort Utility",
+      "subtitle": "Cài xong ứng dụng, đo theo hướng dẫn rồi quay lại đây nhập kết quả",
+      "enter": "Nhập kết quả đo"
+    },
+    "guide": {
+      "title": "Hướng dẫn đo sóng trên iPhone",
+      "short": "Mở AirPort Utility, quét Wi-fi <b>{{ssid}}</b> tại vị trí cần đo và ghi nhớ chỉ số RSSI.",
+      "shortGeneric": "Mở AirPort Utility, quét Wi-fi nhà bạn tại vị trí cần đo và ghi nhớ chỉ số RSSI.",
+      "showGuide": "Xem hướng dẫn",
+      "enter": "Tôi đã có kết quả, nhập ngay",
+      "steps": {
+        "settings": "Mở <b>Cài đặt</b> iPhone → <b>Ứng dụng</b> → <b>AirPort Utility</b> → bật <b>Máy quét Wi-Fi</b>. Chỉ cần làm 1 lần.",
+        "scan": "Đứng tại <b>phòng cần đo</b>, mở ứng dụng <b>AirPort Utility</b> → bấm <b>Quét Wi-Fi</b> → <b>Quét</b>.",
+        "read": "Tìm Wi-fi <b>{{ssid}}</b>, ghi nhớ chỉ số <b>RSSI</b> (ví dụ: -65 dBm).",
+        "readGeneric": "Tìm Wi-fi nhà bạn, ghi nhớ chỉ số <b>RSSI</b> (ví dụ: -65 dBm).",
+        "enter": "Quay lại ứng dụng <b>Quản lý Internet</b> và nhập chỉ số <b>RSSI</b> vừa đo được."
+      }
+    },
+    "input": {
+      "label": "Nhập chỉ số RSSI",
+      "placeholder": "Nhập chỉ số",
+      "helper": "Nhập số RSSI của Wi-fi <b>{{ssid}}</b> trong AirPort Utility. Chỉ số càng gần 0, sóng càng mạnh.",
+      "helperGeneric": "Nhập số RSSI của Wi-fi nhà bạn trong AirPort Utility. Chỉ số càng gần 0, sóng càng mạnh.",
+      "helperAndroid": "Nhập chỉ số RSSI của Wi-fi nhà bạn đo bằng ứng dụng đo sóng. Chỉ số càng gần 0, sóng càng mạnh.",
+      "range": "Giá trị hợp lệ từ -{{min}} đến -{{max}} dBm.",
+      "preview": "Mức sóng tương ứng: {{level}}",
+      "save": "Lưu kết quả",
+      "showGuide": "Xem hướng dẫn",
+      "openApp": "AirPort Utility"
+    }
+  }
+}

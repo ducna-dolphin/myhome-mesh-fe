@@ -1,0 +1,9 @@
+.device-edit__loading {
+  display: grid;
+  gap: var(--space-3);
+}
+.device-edit__back {
+  justify-self: center;
+  color: var(--color-brand);
+  font-weight: var(--font-weight-semibold);
+}

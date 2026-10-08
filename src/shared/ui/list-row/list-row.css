@@ -1,0 +1,128 @@
+.ui-list-row {
+  position: relative;
+  min-height: var(--size-row);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+.ui-list-row--plain + .ui-list-row--plain {
+  border-top: 1px solid var(--color-divider);
+}
+.ui-list-row--card {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.ui-list-row__icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.ui-list-row__icon--brand {
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+.ui-list-row__icon--danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-fg);
+}
+.ui-list-row__icon--neutral {
+  background: var(--color-track);
+  color: var(--color-text-2);
+}
+
+.ui-list-row__body {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  text-align: left;
+}
+/* Reset for the button/link variant. */
+.ui-list-row__action {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+/* Stretch the action over the whole row; the trailing slot sits above it. */
+.ui-list-row__action::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.ui-list-row--card {
+  isolation: isolate;
+}
+.ui-list-row__action:focus-visible {
+  outline: none;
+}
+.ui-list-row__action:focus-visible::after {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: calc(-1 * var(--focus-ring-width));
+  border-radius: var(--radius-md);
+}
+.ui-list-row.is-interactive {
+  transition:
+    background-color var(--duration-instant) var(--ease-standard),
+    transform var(--duration-instant) var(--ease-standard);
+}
+.ui-list-row.is-interactive:not(.is-disabled):has(.ui-list-row__action:active) {
+  background: var(--color-input);
+}
+.ui-list-row--card.is-interactive:not(.is-disabled):has(.ui-list-row__action:active) {
+  transform: scale(0.98);
+}
+.ui-list-row.is-disabled {
+  opacity: 0.55;
+}
+.ui-list-row.is-disabled .ui-list-row__action {
+  cursor: not-allowed;
+}
+
+.ui-list-row__title {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ui-list-row--danger .ui-list-row__title {
+  color: var(--color-danger-fg);
+}
+.ui-list-row__subtitle,
+.ui-list-row__meta {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ui-list-row__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.ui-list-row__trailing {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-2);
+}
+.ui-list-row__chevron {
+  color: var(--color-chevron);
+}
